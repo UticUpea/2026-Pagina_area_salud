@@ -28,14 +28,20 @@
         >
           <ul class="nav navbar-nav navbar-center">
             <li class="dropdown">
-              <router-link data-toggle="dropdown" to="/" :style="{ color: colors.text }"
-                >INICIO <i class="fa fa-angle-down" aria-hidden="true"></i
-              ></router-link>
-              <ul class="dropdown-menu" :style="dropdownStyles">
+              <router-link data-toggle="dropdown" to="/" :style="{ color: colors.text }">
+                INICIO <i class="fa fa-angle-down" aria-hidden="true"></i>
+              </router-link>
+              <ul 
+                class="dropdown-menu" 
+                :style="{
+                  background: colors.dropdownBg + ' !important',
+                  border: '2px solid ' + colors.primary + ' !important'
+                }"
+              >
                 <li>
-                  <router-link to="/about" @click="click_m()" :style="{ color: colors.text }"
-                    >SOBRE NOSOTROS</router-link
-                  >
+                  <router-link to="/about" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    SOBRE NOSOTROS
+                  </router-link>
                 </li>
               </ul>
             </li>
@@ -45,16 +51,26 @@
             </li>
 
             <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
-                >CONVOCATORIAS
-                <i class="fa fa-angle-down" aria-hidden="true"></i
-              ></a>
-              <ul class="dropdown-menu" :style="dropdownStyles">
+              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+                CONVOCATORIAS
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+              </a>
+              <ul 
+                class="dropdown-menu" 
+                :style="{
+                  background: colors.dropdownBg + ' !important',
+                  border: '2px solid ' + colors.primary + ' !important'
+                }"
+              >
                 <li v-for="(mc, id_mc) of MenuConv" :key="mc.idtipo_conv_comun || id_mc">
                   <router-link
                     :to="'/convocatorias/' + mc.idtipo_conv_comun"
                     @click="click_m()"
-                    :style="{ color: colors.text, borderBottomColor: colors.primary }"
+                    :style="{ 
+                      color: colors.text + ' !important',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                      background: 'transparent !important'
+                    }"
                   >
                     {{ mc.tipo_conv_comun_titulo }}
                   </router-link>
@@ -63,15 +79,25 @@
             </li>
 
             <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
-                >CURSOS <i class="fa fa-angle-down" aria-hidden="true"></i
-              ></a>
-              <ul class="dropdown-menu" :style="dropdownStyles">
+              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+                CURSOS <i class="fa fa-angle-down" aria-hidden="true"></i>
+              </a>
+              <ul 
+                class="dropdown-menu" 
+                :style="{
+                  background: colors.dropdownBg + ' !important',
+                  border: '2px solid ' + colors.primary + ' !important'
+                }"
+              >
                 <li v-for="(mc, id_mc) of MenuCur" :key="mc.idtipo_curso_otros || id_mc">
                   <router-link
                     :to="'/cursos/' + mc.idtipo_curso_otros"
                     @click="click_m()"
-                    :style="{ color: colors.text, borderBottomColor: colors.primary }"
+                    :style="{ 
+                      color: colors.text + ' !important',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                      background: 'transparent !important'
+                    }"
                   >
                     {{ mc.tipo_conv_curso_nombre }}
                   </router-link>
@@ -80,54 +106,66 @@
             </li>
 
             <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
-                >MÁS <i class="fa fa-angle-down" aria-hidden="true"></i
-              ></a>
-              <ul class="dropdown-menu" :style="dropdownStyles">
+              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+                MÁS <i class="fa fa-angle-down" aria-hidden="true"></i>
+              </a>
+              <ul 
+                class="dropdown-menu" 
+                :style="{
+                  background: colors.dropdownBg + ' !important',
+                  border: '2px solid ' + colors.primary + ' !important'
+                }"
+              >
                 <li>
-                  <router-link to="/servicios" @click="click_m()" :style="{ color: colors.text }"
-                    >SERVICIOS</router-link
-                  >
+                  <router-link to="/servicios" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    SERVICIOS
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/ofertas" @click="click_m()" :style="{ color: colors.text }"
-                    >OFERTAS ACADÉMICAS</router-link
-                  >
+                  <router-link to="/ofertas" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    OFERTAS ACADÉMICAS
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/publicaciones" @click="click_m()" :style="{ color: colors.text }"
-                    >PUBLICACIONES</router-link
-                  >
+                  <router-link to="/publicaciones" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    PUBLICACIONES
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/gaceta" @click="click_m()" :style="{ color: colors.text }"
-                    >GACETA</router-link
-                  >
+                  <router-link to="/gaceta" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    GACETA
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/eventos" @click="click_m()" :style="{ color: colors.text }"
-                    >EVENTOS</router-link
-                  >
+                  <router-link to="/eventos" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    EVENTOS
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/videos" @click="click_m()" :style="{ color: colors.text }"
-                    >VIDEOS</router-link
-                  >
+                  <router-link to="/videos" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                    VIDEOS
+                  </router-link>
                 </li>
               </ul>
             </li>
 
             <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }"
-                >ENLACES <i class="fa fa-angle-down" aria-hidden="true"></i
-              ></a>
-              <ul class="dropdown-menu" :style="dropdownStyles">
+              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+                ENLACES <i class="fa fa-angle-down" aria-hidden="true"></i>
+              </a>
+              <ul 
+                class="dropdown-menu" 
+                :style="{
+                  background: colors.dropdownBg + ' !important',
+                  border: '2px solid ' + colors.primary + ' !important'
+                }"
+              >
                 <li v-for="(link, id_link) of linksData" :key="link.id_link || id_link">
                   <a :href="link.ei_link?.trim() || link.url_link?.trim()" 
                      target="_blank" 
                      rel="noopener noreferrer"
                      :title="link.ei_tipo || link.tipo"
-                     :style="{ color: colors.text }"
+                     :style="{ color: colors.text + ' !important' }"
                   >
                     {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}
                   </a>
@@ -142,6 +180,48 @@
 </template>
 
 <style scoped>
+/* Elimina TODOS los v-bind() del CSS - NO funcionan con objetos complejos */
+
+/* Dropdown menus - Estilos base SIN v-bind */
+.dropdown-menu {
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+  min-width: 280px !important;
+  padding: 10px 0 !important;
+  margin-top: 10px !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.dropdown.open > .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu > li > a {
+  padding: 12px 20px !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  font-size: 13px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dropdown-menu > li:last-child > a {
+  border-bottom: none !important;
+}
+
+.dropdown-menu > li > a:hover {
+  padding-left: 25px !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* =============================================
+   RESTO DE ESTILOS (mantén todo igual)
+   ============================================= */
 
 #header {
   z-index: 1000;
@@ -208,7 +288,6 @@
 .navbar-toggle:not(.collapsed) .icon-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .navbar-toggle:not(.collapsed) .icon-bar:nth-child(3) { transform: rotate(-45deg) translateY(-7px); }
 
-
 .navbar-nav {
   margin: 0;
   display: flex;
@@ -263,42 +342,6 @@
 .navbar-nav > li > a:hover::after,
 .navbar-nav > li > router-link:hover::after {
   width: 60%;
-}
-
-.dropdown-menu {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  min-width: 280px;
-  padding: 10px 0;
-  margin-top: 10px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
-}
-
-.dropdown.open > .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.dropdown-menu > li > a {
-  padding: 12px 20px;
-  border: none;
-  transition: all 0.3s ease;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dropdown-menu > li:last-child > a {
-  border-bottom: none;
-}
-
-.dropdown-menu > li > a:hover {
-  padding-left: 25px;
-  background: rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 991px) {
@@ -386,7 +429,7 @@
     float: none;
     width: 100%;
     box-shadow: none;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2) !important;
     border-radius: 0;
     margin: 0;
     padding: 0;
@@ -434,7 +477,6 @@
   }
 }
 </style>
-
 <script>
 import { mapState } from "vuex";
 import TopHeaderCustom from "@/components/TopHeaderCustom.vue";
@@ -465,22 +507,28 @@ export default {
       return this.Institucion?.Descripcion || this.Institucion;
     },
 
+    // ✅ 100% DINÁMICO: Usa el PRIMER color que devuelve la API
     colors() {
-      const colors = this.Institucion?.colorinstitucion?.find(c => c.id_color === 9);
+      const colorList = this.Institucion?.colorinstitucion || [];
+      const colors = colorList[0];
       
       if (colors) {
+        const primary = colors.color_primario || '#C00014';
+        const secondary = colors.color_secundario || '#FEFEFE';
+        const tertiary = colors.color_terciario || '#F1EDEF';
+        
         return {
-          primary: colors.color_primario || '#C00014',     
-          secondary: colors.color_secundario || '#FEFEFE',  
-          tertiary: colors.color_terciario || '#F1EDEF',   
-          text: '#FFFFFF',                      
-          border: 'rgba(255, 255, 255, 0.3)',    
-          mobileBg: 'linear-gradient(180deg, #C00014 0%, #8b000c 100%)',
-          dropdownBg: '#C00014',                        
-          hoverBg: 'rgba(255, 255, 255, 0.1)'
+          primary,
+          secondary,
+          tertiary,
+          text: this.getContrastColor(primary),
+          border: 'rgba(255, 255, 255, 0.3)',
+          mobileBg: `linear-gradient(180deg, ${primary} 0%, ${this.adjustColor(primary, -30)} 100%)`,
+          dropdownBg: primary,
+          hoverBg: 'rgba(255, 255, 255, 0.15)'
         };
       }
-
+      
       return {
         primary: '#C00014',
         secondary: '#FEFEFE',
@@ -489,7 +537,7 @@ export default {
         border: 'rgba(255, 255, 255, 0.3)',
         mobileBg: 'linear-gradient(180deg, #C00014 0%, #8b000c 100%)',
         dropdownBg: '#C00014',
-        hoverBg: 'rgba(255, 255, 255, 0.1)'
+        hoverBg: 'rgba(255, 255, 255, 0.15)'
       };
     },
 
@@ -519,10 +567,23 @@ export default {
   },
   
   methods: {
+    getContrastColor(hexColor) {
+      if (!hexColor) return '#FFFFFF';
+      const color = hexColor.replace('#', '');
+      if (color.length !== 6) return '#FFFFFF';
+      const r = parseInt(color.substr(0, 2), 16);
+      const g = parseInt(color.substr(2, 2), 16);
+      const b = parseInt(color.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5 ? '#000000' : '#FFFFFF';
+    },
 
     adjustColor(color, amount) {
-      return '#' + color.replace(/^#/, '').replace(/../g, color => 
-        ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2)
+      if (!color) return color;
+      const clean = color.replace('#', '');
+      if (clean.length !== 6) return color;
+      return '#' + clean.replace(/../g, hex => 
+        ('0' + Math.min(255, Math.max(0, parseInt(hex, 16) + amount)).toString(16)).substr(-2)
       );
     },
     
@@ -591,6 +652,10 @@ export default {
       this.getLinks();
       this.$store.commit('setGetter', false);
     }
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🎨 Header - Colores:', this.colors);
+    }
   },
 
   watch: {
@@ -602,4 +667,6 @@ export default {
     },
   },
 };
+
+
 </script>
