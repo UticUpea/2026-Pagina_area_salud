@@ -1,0 +1,66 @@
+stages:
+  - pull
+  - build
+  - deploy
+
+refresh:
+  stage: pull
+  script:
+    - echo "Refreshing repository"
+    - echo "Pull from repository..."
+    - cd "$ROOT_DIRECTORY"/"$BASE_REPOSITORY"
+    - pwd
+    - git restore .
+    - git pull http://"$ROOT_USER":"$ROOT_PASSWORD"@gitlabsie.upea.bo/"$GROUP"/"$BASE_REPOSITORY".git master
+
+building:
+  stage: build
+  script:
+    - echo "Building start..."
+    - cd "$ROOT_DIRECTORY"/"$BASE_REPOSITORY"
+    - pwd
+    - echo "Instalar dependencias del proyecto"
+    - npm install
+    # MEDICINA Institucion=9 Carrera=14
+    - echo "Deploy para Medicina"
+    - printf 'VUE_APP_ROOT_API="https://serviciopagina.upea.bo/"\nVUE_APP_ID_INSTITUCION=9\nVUE_APP_ID_CARRERA=14\n' > .env
+    - cat .env
+    - npm run build
+    - if [ -d 'medicina' ]; then rm -r medicina ; fi
+    - mv dist medicina
+    # ENFERMERÍA Institucion=32 Carrera=9
+    - echo "Deploy para Enfermería"
+    - printf 'VUE_APP_ROOT_API="https://serviciopagina.upea.bo/"\nVUE_APP_ID_INSTITUCION=32\nVUE_APP_ID_CARRERA=9\n' > .env
+    - cat .env
+    - npm run build
+    - if [ -d 'enfermeria' ]; then rm -r enfermeria ; fi
+    - mv dist enfermeria
+    # NUTRICIÓN Institucion=33 Carrera=31
+    - echo "Deploy para Nutrición"
+    - printf 'VUE_APP_ROOT_API="https://serviciopagina.upea.bo/"\nVUE_APP_ID_INSTITUCION=33\nVUE_APP_ID_CARRERA=31\n' > .env
+    - cat .env
+    - npm run build
+    - if [ -d 'nutricion' ]; then rm -r nutricion ; fi
+    - mv dist nutricion
+    # VETERINARIA Institucion=20 Carrera=17
+    - echo "Deploy para Veterinaria"
+    - printf 'VUE_APP_ROOT_API="https://serviciopagina.upea.bo/"\nVUE_APP_ID_INSTITUCION=20\nVUE_APP_ID_CARRERA=17\n' > .env
+    - cat .env
+    - npm run build
+    - if [ -d 'veterinaria' ]; then rm -r veterinaria ; fi
+    - mv dist veterinaria
+    # INDUSTRIA PECUARIA Institucion=49 Carrera=29
+    - echo "Deploy para Industria pecuaria"
+    - printf 'VUE_APP_ROOT_API="https://serviciopagina.upea.bo/"\nVUE_APP_ID_INSTITUCION=49\nVUE_APP_ID_CARRERA=29\n' > .env
+    - cat .env
+    - npm run build
+    - if [ -d 'industriapecuaria' ]; then rm -r industriapecuaria ; fi
+    - mv dist industriapecuaria
+
+    - rm .env
+
+deployment:
+  stage: deploy
+  script:
+    - echo "Deploy..."
+    - pwd
