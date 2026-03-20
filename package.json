@@ -20,7 +20,7 @@
     "vue-owl-carousel": "^2.0.3",
     "vue-pdf-embed": "^1.1.4",
     "vue-router": "^4.0.3",
-    "vue3-carousel": "^0.3.1",
+    "vue3-carousel": "^0.3.3",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

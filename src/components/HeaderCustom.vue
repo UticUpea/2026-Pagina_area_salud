@@ -8,8 +8,9 @@
         <div class="navbar-header">
           <button 
             type="button" 
-            class="navbar-toggle collapsed"
-            @click="toggleMenu"
+            class="navbar-toggle"
+            :class="{ 'collapsed': isMenuCollapsed }"
+            @click.stop="toggleMenu"
             :aria-expanded="!isMenuCollapsed"
             :style="{ borderColor: colors.border }"
           >
@@ -27,19 +28,24 @@
           :style="{ background: colors.mobileBg }"
         >
           <ul class="nav navbar-nav navbar-center">
-            <li class="dropdown">
-              <router-link data-toggle="dropdown" to="/" :style="{ color: colors.text }">
+            <!-- INICIO -->
+            <li class="dropdown" :class="{ 'open': activeDropdown === 'inicio' }">
+              <router-link 
+                to="/" 
+                @click.stop.prevent="toggleDropdown('inicio')" 
+                :style="{ color: colors.text }"
+              >
                 INICIO <i class="fa fa-angle-down" aria-hidden="true"></i>
               </router-link>
               <ul 
                 class="dropdown-menu" 
                 :style="{
-                  background: colors.dropdownBg + ' !important',
-                  border: '2px solid ' + colors.primary + ' !important'
+                  background: colors.dropdownBg,
+                  border: '2px solid ' + colors.primary
                 }"
               >
                 <li>
-                  <router-link to="/about" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/about" @click="closeAll()" :style="{ color: colors.text }">
                     SOBRE NOSOTROS
                   </router-link>
                 </li>
@@ -47,29 +53,28 @@
             </li>
 
             <li v-if="institucionData?.institucion_historia">
-              <router-link to="/historia" :style="{ color: colors.text }">HISTORIA</router-link>
+              <router-link to="/historia" @click="closeAll()" :style="{ color: colors.text }">HISTORIA</router-link>
             </li>
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+            <li class="dropdown" :class="{ 'open': activeDropdown === 'convocatorias' }">
+              <a href="#" @click.stop.prevent="toggleDropdown('convocatorias')" :style="{ color: colors.text }">
                 CONVOCATORIAS
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
               </a>
               <ul 
                 class="dropdown-menu" 
                 :style="{
-                  background: colors.dropdownBg + ' !important',
-                  border: '2px solid ' + colors.primary + ' !important'
+                  background: colors.dropdownBg,
+                  border: '2px solid ' + colors.primary
                 }"
               >
                 <li v-for="(mc, id_mc) of MenuConv" :key="mc.idtipo_conv_comun || id_mc">
                   <router-link
                     :to="'/convocatorias/' + mc.idtipo_conv_comun"
-                    @click="click_m()"
+                    @click="closeAll()"
                     :style="{ 
-                      color: colors.text + ' !important',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'transparent !important'
+                      color: colors.text,
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
                     }"
                   >
                     {{ mc.tipo_conv_comun_titulo }}
@@ -78,25 +83,25 @@
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+            <!-- CURSOS -->
+            <li class="dropdown" :class="{ 'open': activeDropdown === 'cursos' }">
+              <a href="#" @click.stop.prevent="toggleDropdown('cursos')" :style="{ color: colors.text }">
                 CURSOS <i class="fa fa-angle-down" aria-hidden="true"></i>
               </a>
               <ul 
                 class="dropdown-menu" 
                 :style="{
-                  background: colors.dropdownBg + ' !important',
-                  border: '2px solid ' + colors.primary + ' !important'
+                  background: colors.dropdownBg,
+                  border: '2px solid ' + colors.primary
                 }"
               >
                 <li v-for="(mc, id_mc) of MenuCur" :key="mc.idtipo_curso_otros || id_mc">
                   <router-link
                     :to="'/cursos/' + mc.idtipo_curso_otros"
-                    @click="click_m()"
+                    @click="closeAll()"
                     :style="{ 
-                      color: colors.text + ' !important',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'transparent !important'
+                      color: colors.text,
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
                     }"
                   >
                     {{ mc.tipo_conv_curso_nombre }}
@@ -105,59 +110,59 @@
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+            <li class="dropdown" :class="{ 'open': activeDropdown === 'mas' }">
+              <a href="#" @click.stop.prevent="toggleDropdown('mas')" :style="{ color: colors.text }">
                 MÁS <i class="fa fa-angle-down" aria-hidden="true"></i>
               </a>
               <ul 
                 class="dropdown-menu" 
                 :style="{
-                  background: colors.dropdownBg + ' !important',
-                  border: '2px solid ' + colors.primary + ' !important'
+                  background: colors.dropdownBg,
+                  border: '2px solid ' + colors.primary
                 }"
               >
                 <li>
-                  <router-link to="/servicios" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/servicios" @click="closeAll()" :style="{ color: colors.text }">
                     SERVICIOS
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/ofertas" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/ofertas" @click="closeAll()" :style="{ color: colors.text }">
                     OFERTAS ACADÉMICAS
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/publicaciones" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/publicaciones" @click="closeAll()" :style="{ color: colors.text }">
                     PUBLICACIONES
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/gaceta" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/gaceta" @click="closeAll()" :style="{ color: colors.text }">
                     GACETA
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/eventos" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/eventos" @click="closeAll()" :style="{ color: colors.text }">
                     EVENTOS
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/videos" @click="click_m()" :style="{ color: colors.text + ' !important' }">
+                  <router-link to="/videos" @click="closeAll()" :style="{ color: colors.text }">
                     VIDEOS
                   </router-link>
                 </li>
               </ul>
             </li>
 
-            <li class="dropdown">
-              <a data-toggle="dropdown" href="#" :style="{ color: colors.text }">
+            <li class="dropdown" :class="{ 'open': activeDropdown === 'enlaces' }">
+              <a href="#" @click.stop.prevent="toggleDropdown('enlaces')" :style="{ color: colors.text }">
                 ENLACES <i class="fa fa-angle-down" aria-hidden="true"></i>
               </a>
               <ul 
                 class="dropdown-menu" 
                 :style="{
-                  background: colors.dropdownBg + ' !important',
-                  border: '2px solid ' + colors.primary + ' !important'
+                  background: colors.dropdownBg,
+                  border: '2px solid ' + colors.primary
                 }"
               >
                 <li v-for="(link, id_link) of linksData" :key="link.id_link || id_link">
@@ -165,7 +170,8 @@
                      target="_blank" 
                      rel="noopener noreferrer"
                      :title="link.ei_tipo || link.tipo"
-                     :style="{ color: colors.text + ' !important' }"
+                     @click="closeAll()"
+                     :style="{ color: colors.text }"
                   >
                     {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}
                   </a>
@@ -180,10 +186,9 @@
 </template>
 
 <style scoped>
-/* Elimina TODOS los v-bind() del CSS - NO funcionan con objetos complejos */
 
-/* Dropdown menus - Estilos base SIN v-bind */
 .dropdown-menu {
+  display: none;
   border: none !important;
   border-radius: 8px !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
@@ -197,9 +202,10 @@
 }
 
 .dropdown.open > .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
 }
 
 .dropdown-menu > li > a {
@@ -208,6 +214,7 @@
   transition: all 0.3s ease !important;
   font-size: 13px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: block !important;
 }
 
 .dropdown-menu > li:last-child > a {
@@ -218,10 +225,6 @@
   padding-left: 25px !important;
   background: rgba(255, 255, 255, 0.15) !important;
 }
-
-/* =============================================
-   RESTO DE ESTILOS (mantén todo igual)
-   ============================================= */
 
 #header {
   z-index: 1000;
@@ -280,13 +283,27 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-toggle.collapsed .icon-bar:nth-child(1) { transform: rotate(0) translateY(0); }
-.navbar-toggle.collapsed .icon-bar:nth-child(2) { opacity: 1; transform: scaleX(1); }
-.navbar-toggle.collapsed .icon-bar:nth-child(3) { transform: rotate(0) translateY(0); }
+.navbar-toggle.collapsed .icon-bar:nth-child(1) { 
+  transform: rotate(0) translateY(0); 
+}
+.navbar-toggle.collapsed .icon-bar:nth-child(2) { 
+  opacity: 1; 
+  transform: scaleX(1); 
+}
+.navbar-toggle.collapsed .icon-bar:nth-child(3) { 
+  transform: rotate(0) translateY(0); 
+}
 
-.navbar-toggle:not(.collapsed) .icon-bar:nth-child(1) { transform: rotate(45deg) translateY(7px); }
-.navbar-toggle:not(.collapsed) .icon-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.navbar-toggle:not(.collapsed) .icon-bar:nth-child(3) { transform: rotate(-45deg) translateY(-7px); }
+.navbar-toggle:not(.collapsed) .icon-bar:nth-child(1) { 
+  transform: rotate(45deg) translateY(7px); 
+}
+.navbar-toggle:not(.collapsed) .icon-bar:nth-child(2) { 
+  opacity: 0; 
+  transform: scaleX(0); 
+}
+.navbar-toggle:not(.collapsed) .icon-bar:nth-child(3) { 
+  transform: rotate(-45deg) translateY(-7px); 
+}
 
 .navbar-nav {
   margin: 0;
@@ -345,6 +362,14 @@
 }
 
 @media (max-width: 991px) {
+
+  .navbar-collapse.collapse {
+    display: none !important;
+  }
+  .navbar-collapse.collapse.in {
+    display: block !important;
+  }
+
   .navbar-toggle {
     display: block;
     z-index: 1001;
@@ -425,35 +450,37 @@
   }
 
   .dropdown-menu {
-    position: static;
-    float: none;
-    width: 100%;
-    box-shadow: none;
+    position: static !important;
+    float: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
     background: rgba(0, 0, 0, 0.2) !important;
-    border-radius: 0;
-    margin: 0;
-    padding: 0;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: max-height 0.3s ease !important;
+    display: block !important;
   }
   
   .dropdown.open > .dropdown-menu {
-    max-height: 500px;
+    max-height: 500px !important;
   }
   
   .dropdown-menu > li > a {
-    padding: 14px 25px 14px 45px;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 14px 25px 14px 45px !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: #fff !important;
   }
   
   .dropdown-menu > li > a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    padding-left: 50px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    padding-left: 50px !important;
   }
   
   .navbar-collapse::-webkit-scrollbar { width: 6px; }
@@ -477,12 +504,15 @@
   }
 }
 </style>
+
 <script>
 import { mapState } from "vuex";
 import TopHeaderCustom from "@/components/TopHeaderCustom.vue";
 import api from '@/plugins/axios';
 
 export default {
+  name: "HeaderCustom",
+  
   data() {
     return {
       sopen: false,
@@ -493,6 +523,8 @@ export default {
       m_link: false,
       isHome: false,
       isMenuCollapsed: true,
+      activeDropdown: null,
+      isMobile: false,
     };
   },
   
@@ -507,7 +539,6 @@ export default {
       return this.Institucion?.Descripcion || this.Institucion;
     },
 
-    // ✅ 100% DINÁMICO: Usa el PRIMER color que devuelve la API
     colors() {
       const colorList = this.Institucion?.colorinstitucion || [];
       const colors = colorList[0];
@@ -587,30 +618,42 @@ export default {
       );
     },
     
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 991;
+    },
+    
     toggleMenu() {
       this.isMenuCollapsed = !this.isMenuCollapsed;
+      if (this.isMobile) {
+        this.activeDropdown = null;
+      }
     },
     
-    click_m() {
+    toggleDropdown(dropdownName) {
+      if (this.activeDropdown === dropdownName) {
+        this.activeDropdown = null;
+      } else {
+        this.activeDropdown = dropdownName;
+      }
+    },
+    
+    closeAll() {
+      this.activeDropdown = null;
       this.$store.commit("clickLink");
-      if (window.innerWidth <= 991) {
-        this.isMenuCollapsed = true;
-      }
-      this.openMenu();
-    },
-    
-    showSubMenu(id) {
-      const menus = { m_inicio: false, m_conv: false, m_cur: false, m_mas: false, m_link: false };
-      if (Object.hasOwn(menus, id)) {
-        this[id] = true;
-        Object.keys(menus).forEach(key => {
-          if (key !== id) this[key] = false;
-        });
+      if (this.isMobile) {
+        setTimeout(() => {
+          this.isMenuCollapsed = true;
+        }, 150);
       }
     },
     
-    openMenu() {
-      this.sopen = !this.sopen;
+    handleClickOutside(event) {
+      if (!this.$refs.navbar?.contains(event.target)) {
+        if (!this.isMenuCollapsed) {
+          this.isMenuCollapsed = true;
+        }
+        this.activeDropdown = null;
+      }
     },
     
     async getLinks() {
@@ -653,20 +696,28 @@ export default {
       this.$store.commit('setGetter', false);
     }
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🎨 Header - Colores:', this.colors);
-    }
+    this.checkMobile();
+    window.addEventListener('resize', this.checkMobile);
+    document.addEventListener('click', this.handleClickOutside);
+    
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.log('🎨 Header - Colores:', this.colors);
+    // }
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('resize', this.checkMobile);
+    document.removeEventListener('click', this.handleClickOutside);
   },
 
   watch: {
     $route(to) {
       this.isHome = to.path === "/";
-      if (window.innerWidth <= 991) {
+      if (this.isMobile) {
         this.isMenuCollapsed = true;
+        this.activeDropdown = null;
       }
     },
   },
 };
-
-
 </script>

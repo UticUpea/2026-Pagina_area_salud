@@ -18,7 +18,7 @@
             <p class="left-aligned">
               Inscripciones en línea para los estudiantes nuevos y antiguos.
             </p>
-            <a href="https://inscripciones.upea.bo" target="_blank" rel="noopener noreferrer" class="more">
+            <a href="https://inscripciones.upea.bo          " target="_blank" rel="noopener noreferrer" class="more">
               <i class="fa fa-angle-right" aria-hidden="true"></i>
             </a>
           </div>
@@ -44,7 +44,7 @@
               Formación en línea de los estudiantes de la carrera de
               {{ formatNombreCarrera(institucionData.institucion_nombre) }}.
             </p>
-            <a href="https://virtualmedicina.upea.bo" target="_blank" rel="noopener noreferrer" class="more">
+            <a href="https://virtualmedicina.upea.bo          " target="_blank" rel="noopener noreferrer" class="more">
               <i class="fa fa-angle-right" aria-hidden="true"></i>
             </a>
           </div>
@@ -75,10 +75,10 @@
   <!-- ==============================================
     ** VISION - MISION **
     =================================================== -->
-  <section class="our-impotance ">
-    <div class="container">
-      <div class="section_our_solution col-sm-6">
-        <div class="row">
+  <section class="our-impotance mission-vision-section">
+    <div class="container-fluid"> <!-- ✅ Cambiado a container-fluid para más ancho -->
+      <div class="row">
+        <div class="col-md-6 col-lg-6"> <!-- ✅ Columnas más amplias -->
           <div class="our_solution_category">
             <div class="solution_cards_box">
               <div class="solution_card">
@@ -94,10 +94,8 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="section_our_solution col-sm-6">
-        <div class="row">
+        <div class="col-md-6 col-lg-6"> <!-- ✅ Columnas más amplias -->
           <div class="our_solution_category">
             <div class="solution_cards_box">
               <div class="solution_card">
@@ -151,7 +149,7 @@
     =================================================== -->
   <section class="our-impotance padding-lg">
     <div class="container center-content">
-      <ul class="row">
+      <ul class="row menu-grid">
         <router-link class="col-lg-4 col-md-6 col-sm-12 equal-hight" to="/publicaciones">
           <div class="card2">
             <div class="inner">
@@ -397,7 +395,7 @@
               </a>
             </li>
             <li v-if="autoridad.celular_autoridad">
-              <a :href="'https://wa.me/+591' + String(autoridad.celular_autoridad).replace(/[^0-9]/g, '')" 
+              <a :href="'https://wa.me/+591          ' + String(autoridad.celular_autoridad).replace(/[^0-9]/g, '')" 
                  target="_blank" 
                  rel="noopener noreferrer">
                 <i class="fa fa-whatsapp" aria-hidden="true"></i>
@@ -411,7 +409,7 @@
 
   <div>
     <div class="whatsapp-button">
-      <a :href="'https://wa.me/+591' + (institucionData.institucion_celular1?.toString().replace(/[^0-9]/g, '') || '')" 
+      <a :href="'https://wa.me/+591          ' + (institucionData.institucion_celular1?.toString().replace(/[^0-9]/g, '') || '')" 
          target="_blank" 
          rel="noopener noreferrer">
         <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
@@ -437,6 +435,81 @@
   align-items: center;
   text-align: center;
 }
+
+/* =========================================
+   MENU CENTRADO - RESPONSIVE
+   ========================================= */
+.menu-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  list-style: none !important;
+  width: 100% !important;
+  max-width: 1200px !important;
+}
+
+/* Desktop - 3 columnas centradas */
+@media (min-width: 992px) {
+  .menu-grid > router-link,
+  .menu-grid > a {
+    flex: 0 0 auto !important;
+    width: 280px !important;
+    max-width: 280px !important;
+    margin: 15px !important;
+    display: inline-block !important;
+  }
+}
+
+/* Tablet - 2 columnas centradas */
+@media (min-width: 768px) and (max-width: 991px) {
+  .menu-grid > router-link,
+  .menu-grid > a {
+    flex: 0 0 auto !important;
+    width: 280px !important;
+    max-width: 280px !important;
+    margin: 15px !important;
+    display: inline-block !important;
+  }
+}
+
+/* Móvil - 1 columna centrada */
+@media (max-width: 767px) {
+  .menu-grid > router-link,
+  .menu-grid > a {
+    flex: 0 0 auto !important;
+    width: 280px !important;
+    max-width: 280px !important;
+    margin: 15px auto !important;
+    display: block !important;
+  }
+}
+
+/* Ocultar los <br> */
+.menu-grid br {
+  display: none !important;
+}
+
+/* =========================================
+   MISIÓN Y VISIÓN - SECCIÓN AMPLIADA
+   ========================================= */
+.mission-vision-section {
+  padding: 60px 0;
+  background: #f8f9fa;
+}
+
+.mission-vision-section .container-fluid {
+  max-width: 1400px; /* ✅ Ancho máximo más amplio */
+  margin: 0 auto;
+  padding: 0 30px; /* ✅ Más padding lateral */
+}
+
+.mission-vision-section .col-md-6 {
+  padding: 20px; /* ✅ Espacio entre columnas */
+}
+
 .section_our_solution .row {
   align-items: center;
 }
@@ -450,32 +523,42 @@
   flex-direction: column;
   justify-content: center;
 }
+
 .solution_cards_box .solution_card {
   flex: 0 50%;
   background: #fff;
   box-shadow: 0 2px 4px 0 rgba(185, 186, 194, 0.2),
     0 5px 15px 0 rgba(90, 91, 99, 0.15);
   border-radius: 15px;
-  padding: 10px 15px;
+  padding: 40px 45px; /* ✅ Más padding interno */
   position: relative;
   z-index: 1;
-  overflow: hidden;
-  min-height: 265px;
+  overflow: visible;
+  min-height: auto;
+  height: auto;
   transition: 0.7s;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
 }
+
 .solution_cards_box .solution_card:hover {
   background: var(--main-color);
   color: #fff;
   transform: scale(1.1);
-  z-index: 9;
+  z-index: 10;
+  pointer-events: auto;
 }
+
 .solution_cards_box .solution_card:hover::before {
   background: rgba(183, 187, 204, 0.1);
 }
+
 .solution_cards_box .solution_card:hover .solu_title h3,
 .solution_cards_box .solution_card:hover .solu_description p {
   color: #fff;
 }
+
 .solution_cards_box .solution_card:before {
   content: "";
   position: absolute;
@@ -488,20 +571,48 @@
   top: -23px;
   border-radius: 35px;
 }
+
 .solution_cards_box .solution_card:hover .solu_description button {
   background: #fff !important;
   color: #e2c3c3;
 }
+
+.solution_card .solu_title {
+  position: relative;
+  z-index: 1;
+}
+
 .solution_card .solu_title div {
   color: #212121;
   font-size: 1.3rem;
   margin-top: 13px;
   margin-bottom: 13px;
 }
-.solution_card .solu_description p {
-  font-size: 15px;
-  margin-bottom: 15px;
+
+.solution_card .solu_title h3 {
+  font-size: 32px; /* ✅ Título más grande */
+  margin-bottom: 25px;
+  word-wrap: break-word;
+  font-weight: 700;
 }
+
+.solution_card .solu_description {
+  flex: 1;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+}
+
+.solution_card .solu_description p {
+  font-size: 16px; /* ✅ Texto más grande */
+  margin-bottom: 15px;
+  line-height: 1.8; /* ✅ Más espacio entre líneas */
+  overflow: visible;
+  word-wrap: break-word;
+  hyphens: auto;
+  text-align: justify;
+}
+
 .solution_card .solu_description button {
   border: 0;
   border-radius: 15px;
@@ -511,28 +622,30 @@
   font-size: 1rem;
   padding: 5px 16px;
 }
-.our_solution_content div {
-  text-transform: capitalize;
-  margin-bottom: 1rem;
-  font-size: 2.5rem;
-}
+
+/* =========================================
+   BURBUJAS DINÁMICAS - DENTRO DEL CUADRO
+   ========================================= */
 .hover_color_bubble {
   position: absolute;
   background: rgba(143, 148, 172, 0.15);
-  width: 100rem;
-  height: 100rem;
-  left: 0;
-  right: 0;
-  z-index: -1;
-  top: 16rem;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  transform: rotate(-36deg);
-  left: -18rem;
+  top: -50px;
+  right: -50px;
+  z-index: 0;
   transition: 0.7s;
+  pointer-events: none;
 }
+
 .solution_cards_box .solution_card:hover .hover_color_bubble {
-  top: 0rem;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  opacity: 0.3;
 }
+
 .solution_cards_box .solution_card .so_top_icon {
   width: 60px;
   height: 60px;
@@ -543,11 +656,45 @@
   align-items: center;
   justify-content: center;
 }
+
 .solution_cards_box .solution_card .so_top_icon img {
   width: 40px;
   height: 50px;
   object-fit: contain;
 }
+
+/* Responsive para tarjetas Misión/Visión */
+@media (max-width: 768px) {
+  .mission-vision-section .container-fluid {
+    padding: 0 15px;
+  }
+  
+  .mission-vision-section .col-md-6 {
+    padding: 10px;
+  }
+  
+  .solution_cards_box .solution_card {
+    padding: 30px 25px;
+    min-height: auto;
+    margin-bottom: 30px;
+  }
+  
+  .solution_card .solu_title h3 {
+    font-size: 28px;
+  }
+  
+  .solution_card .solu_description p {
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: left;
+  }
+  
+  .hover_color_bubble {
+    width: 150px;
+    height: 150px;
+  }
+}
+
 @media screen and (min-width: 320px) {
   .sol_card_top_3 { position: relative; top: 0; }
   .our_solution_category { width: 100%; margin: 8px auto; }
@@ -560,6 +707,10 @@
   .sol_card_top_3 { position: relative; top: -3rem; }
   .our_solution_category { width: 80%; margin: 8px auto; }
 }
+
+/* =========================================
+   TARJETAS DEL MENÚ (card2)
+   ========================================= */
 .card {
   width: 250px;
   background: white;
@@ -576,6 +727,7 @@
   color: rgb(88, 87, 87);
 }
 .heading:hover { cursor: pointer; }
+
 .card2 {
   box-sizing: border-box;
   width: 190px;
@@ -594,14 +746,23 @@
   user-select: none;
   font-weight: bolder;
   color: black;
+  position: relative;
+  z-index: 100;
+  pointer-events: auto;
 }
+
 .card2:hover {
   border: 1px solid var(--main-color);
   transform: scale(1.05);
 }
+
 .card2:active {
   transform: scale(0.95) rotateZ(1.7deg);
 }
+
+/* =========================================
+   TARJETAS NOVEDADES (card3)
+   ========================================= */
 .card3 {
   padding: 20px;
   width: 330px;
@@ -655,6 +816,10 @@
   color: #fff;
   text-decoration: none;
 }
+
+/* =========================================
+   SECCIÓN ABOUT - 3 CUADROS SUPERIORES
+   ========================================= */
 .cat-area a {
   height: 28px;
   line-height: 28px;
@@ -672,7 +837,6 @@
   overflow: auto;
 }
 
-/* Igualar altura de los 3 cuadros superiores */
 .our-links {
   display: flex;
   flex-wrap: nowrap;
@@ -682,7 +846,7 @@
 .our-links > li {
   display: flex;
   flex-direction: column;
-  height: 180px; /* Altura fija para todos */
+  height: 180px;
   overflow: hidden;
 }
 
@@ -694,9 +858,115 @@
 }
 
 .our-links .detail p {
-  max-height: 60px; /* Limitar altura del texto */
+  max-height: 60px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.about {
+  display: block;
+  position: relative;
+  padding: 222px 0 100px 0;
+  background: #f8f9fa;
+}
+
+.about ul.our-links {
+  display: block;
+  margin: -280px 0 0 0;
+  position: relative;
+  z-index: 99;
+}
+
+.about ul.our-links li {
+  display: block;
+  position: relative;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.about ul.our-links li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.about ul.our-links li.apply-online {
+  background: var(--main-color-3);
+  color: #fff;
+}
+
+.about ul.our-links li.prospects {
+  background: var(--main-color-2);
+  color: #fff;
+}
+
+.about ul.our-links li.certification {
+  background: #f0bc01;
+  color: #fff;
+}
+
+.about ul.our-links li .icon {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.about ul.our-links li .icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.about ul.our-links li .detail {
+  color: #fff;
+}
+
+.about ul.our-links li .detail h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.about ul.our-links li .detail p {
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.about ul.our-links li .detail a.more {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 36px;
+  background: #fff;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 18px;
+  color: var(--main-color-3);
+  transition: all 0.3s ease;
+}
+
+.about ul.our-links li .detail a.more:hover {
+  transform: scale(1.1);
+  background: var(--main-color-3);
+  color: #fff;
+}
+
+/* =========================================
+   Z-INDEX GLOBAL PARA EVITAR CONFLICTOS
+   ========================================= */
+.our-impotance > .container {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.our-impotance.padding-lg {
+  position: relative;
+  z-index: 5;
 }
 
 </style>
@@ -756,7 +1026,7 @@ export default {
     },
     
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo          ').trim();
     },
     
     convocatoriasList() { return this.convocatorias?.length ? this.convocatorias : this.convocatoriasLocal; },
@@ -927,7 +1197,31 @@ export default {
 
     blockRighClick(event) {
       event.preventDefault();
+    },
+    
+     updateCssVariables() {
+    const colorList = this.Institucion?.colorinstitucion || [];
+    const colors = colorList[0];
+    
+    if (colors && colors.color_primario) {
+      // Actualiza las variables CSS en :root
+      document.documentElement.style.setProperty('--main-color', colors.color_primario);
+      
+      // Si tienes más colores en la API, actualízalos también:
+      if (colors.color_secundario) {
+        document.documentElement.style.setProperty('--main-color-2', colors.color_secundario);
+      }
+      if (colors.color_terciario) {
+        document.documentElement.style.setProperty('--main-color-3', colors.color_terciario);
+      }
+      
+      // console.log('🎨 Colores actualizados:', {
+      //   '--main-color': colors.color_primario,
+      //   '--main-color-2': colors.color_secundario,
+      //   '--main-color-3': colors.color_terciario
+      // });
     }
+  },
   },
 
   created() {
@@ -948,10 +1242,31 @@ export default {
 
   mounted() {
     document.body.addEventListener('contextmenu', this.blockRighClick);
+    this.$nextTick(() => {
+    this.updateCssVariables();
+    
+  });
   },
+  
   
   beforeUnmount() {
     document.body.removeEventListener('contextmenu', this.blockRighClick);
+  },
+
+  watch: {
+  // Re-actualizar cuando cambie la institución
+  Institucion: {
+    handler() {
+      this.$nextTick(() => {
+        this.updateCssVariables();
+      });
+    },
+    deep: true,
+    immediate: true
   }
+}
+
+
 };
+
 </script>

@@ -88,7 +88,7 @@
             </div>
             <p :style="{ color: colors.textSecondary }">
               © {{ currentYear }} 
-              <span :style="{ color: colors.primary, fontWeight: '600' }">
+              <span :style="{ color: colors.color_secundario, fontWeight: '600' }">
                 Carrera de {{ formatNombreCarrera(institucionData?.institucion_nombre) || 'Cargando...' }}
               </span>. Todos los derechos reservados - by: Fernando Aguilar
             </p>
@@ -136,11 +136,10 @@ export default {
     },
 
     currentYear() { return new Date().getFullYear(); },
-    
-    // ✅ 100% DINÁMICO: Usa el primer color que devuelve la API
+
     colors() {
       const colorList = this.Institucion?.colorinstitucion || [];
-      const colors = colorList[0]; // ← Siempre el primero (el backend envía el correcto)
+      const colors = colorList[0];
       
       if (colors) {
         const primary = colors.color_primario || '#C00014';
@@ -204,53 +203,146 @@ export default {
   },
   
   mounted() {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🦶 Footer - Institución:', {
-        id: this.institucionData?.institucion_id,
-        nombre: this.institucionData?.institucion_nombre
-      });
-      console.log('🦶 Footer - Colores aplicados:', this.colors);
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //     console.log(' Footer - Institución:', {
+    //     id: this.institucionData?.institucion_id,
+    //     nombre: this.institucionData?.institucion_nombre
+    //   });
+
+    // }
   }
 };
 </script>
 
 <style scoped>
-/* =============================================
-   FOOTER - ESTILOS BASE
-   ============================================= */
-.footer { margin-top: 0; font-family: inherit; }
-.footer .bottom { padding: 40px 0 20px; transition: background 0.3s ease; }
-.footer h3 { font-size: 16px; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 0.5px; transition: color 0.3s ease; }
-.footer p { font-size: 14px; line-height: 1.6; margin-bottom: 10px; transition: color 0.3s ease; }
+
+.footer { 
+  margin-top: 0; 
+  font-family: inherit; 
+}
+.footer .bottom { 
+  padding: 40px 0 20px; 
+  transition: background 0.3s ease; 
+}
+.footer h3 { 
+  font-size: 16px; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  margin-bottom: 20px; 
+  letter-spacing: 0.5px; 
+  transition: color 0.3s ease; 
+}
+.footer p { 
+  font-size: 14px; 
+  line-height: 1.6; 
+  margin-bottom: 10px; 
+  transition: color 0.3s ease; 
+}
 
 /* Iconos sociales */
-.follow-us { list-style: none; padding: 0; margin: 0; display: flex; gap: 12px; flex-wrap: wrap; }
-.follow-us li a { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); transition: all 0.3s ease; text-decoration: none; }
-.follow-us li a:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.25); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-.follow-us li a i { font-size: 18px; transition: transform 0.3s ease; }
-.follow-us li a:hover i { transform: scale(1.1); }
+.follow-us { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+  display: flex; 
+  gap: 12px; 
+  flex-wrap: wrap; 
+}
+.follow-us li a { 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  width: 40px; height: 40px; 
+  border-radius: 50%; 
+  background: rgba(255, 255, 255, 0.15); 
+  transition: all 0.3s ease; 
+  text-decoration: none; 
+}
+.follow-us li a:hover { 
+  transform: translateY(-3px); 
+  background: rgba(255, 255, 255, 0.25); 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+}
+.follow-us li a i { 
+  font-size: 18px; 
+  transition: transform 0.3s ease; 
+}
+.follow-us li a:hover i { 
+  transform: scale(1.1); 
+}
 
 /* Logos */
-.footer-logo { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-.footer-logo img { border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.footer-logo img:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+.footer-logo { 
+  display: flex; 
+  align-items: center; 
+  flex-wrap: wrap; 
+  gap: 10px; 
+  margin-bottom: 15px; 
+}
+.footer-logo img { 
+  border-radius: 8px; 
+  transition: transform 0.3s ease, 
+  box-shadow 0.3s ease;
+ }
+.footer-logo img:hover { 
+  transform: scale(1.05); 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+}
 
 /* Copyright */
-.footer .bottom p { font-size: 13px; opacity: 0.9; margin-top: 15px; }
-.footer .bottom p span { font-weight: 600; }
+.footer .bottom p { 
+  font-size: 13px; 
+  opacity: 0.9; 
+  margin-top: 15px; 
+}
+.footer .bottom p span { 
+  font-weight: 600; 
+}
 
 /* Scroll to top */
-.scroll-top { position: fixed; bottom: 25px; right: 25px; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; z-index: 999; }
-.scroll-top:hover { transform: translateY(-5px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); }
-.scroll-top i { font-size: 18px; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .footer .bottom { padding: 30px 0 15px; text-align: center; }
-  .follow-us { justify-content: center; }
-  .footer-logo { justify-content: center; }
-  .scroll-top { bottom: 15px; right: 15px; width: 40px; height: 40px; }
+.scroll-top { 
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  text-decoration: none; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+  transition: all 0.3s ease; 
+  z-index: 999; 
 }
-.color { color: var(--main-color-3, currentColor); }
+.scroll-top:hover { 
+  transform: translateY(-5px); 
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); 
+}
+.scroll-top i { 
+  font-size: 18px; 
+}
+
+
+@media (max-width: 768px) {
+  .footer .bottom { 
+    padding: 30px 0 15px; 
+    text-align: center; 
+  }
+  .follow-us { 
+    justify-content: center; 
+  }
+  .footer-logo { 
+    justify-content: center; 
+  }
+  .scroll-top { 
+    bottom: 15px; 
+    right: 15px; 
+    width: 40px; 
+    height: 40px; 
+  }
+}
+.color { 
+  color: var(--main-color-3, currentColor); 
+  }
 </style>
