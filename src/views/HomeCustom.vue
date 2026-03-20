@@ -1215,11 +1215,6 @@ export default {
         document.documentElement.style.setProperty('--main-color-3', colors.color_terciario);
       }
       
-      // console.log('🎨 Colores actualizados:', {
-      //   '--main-color': colors.color_primario,
-      //   '--main-color-2': colors.color_secundario,
-      //   '--main-color-3': colors.color_terciario
-      // });
     }
   },
   },
