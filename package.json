@@ -18,7 +18,6 @@
     "randombytes": "^2.1.0",
     "vue": "^3.2.13",
     "vue-axios": "^3.4.1",
-    "vue-owl-carousel": "^2.0.3",
     "vue-pdf-embed": "^1.1.4",
     "vue-router": "^4.0.3",
     "vue3-carousel": "^0.3.3",
