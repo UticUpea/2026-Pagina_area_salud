@@ -237,7 +237,7 @@
 </template>
 
 <style scoped>
-/* ✅ Tus estilos originales se mantienen 100% intactos */
+
 .enquire-wrapper,
 figure,
 .col-md-5 {

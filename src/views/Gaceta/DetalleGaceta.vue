@@ -116,7 +116,7 @@
 </template>
 
 <style scoped>
-/* ✅ Tus estilos originales se mantienen 100% intactos */
+
 .pdf-container {
   position: relative;
   max-height: 600px;

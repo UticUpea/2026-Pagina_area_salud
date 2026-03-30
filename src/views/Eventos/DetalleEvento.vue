@@ -133,7 +133,7 @@
 </template>
 
 <style scoped>
-/* ✅ Tus estilos originales se mantienen 100% intactos */
+
 .blog-listing,
 .blog-listing li,
 .blog-left,

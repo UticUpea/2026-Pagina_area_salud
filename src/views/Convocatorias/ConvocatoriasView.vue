@@ -117,7 +117,6 @@
 </template>
 
 <style scoped>
-/* ✅ Tus estilos originales se mantienen 100% intactos */
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }

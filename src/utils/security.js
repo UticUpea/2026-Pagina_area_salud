@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
 
 /**
- * ✅ Sanitiza HTML de la API para prevenir XSS
+ * 
  * @param {string} html - Contenido HTML crudo de la API
  * @returns {string} HTML limpio y seguro
  */
