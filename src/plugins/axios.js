@@ -2,13 +2,33 @@ import axios from 'axios'
 
 const clean = (value) => value?.trim() || ''
 
-const API_BASE = clean(process.env.VUE_APP_API_BASE_URL) || 'https://apiadministrador.upea.bo/api/v2'
+const API_BASE = clean(process.env.VUE_APP_API_BASE_URL)
 const API_TOKEN = clean(process.env.VUE_APP_API_TOKEN)
-const UPLOADS_URL = clean(process.env.VUE_APP_UPLOADS_URL) || 'https://apiadministrador.upea.bo'
+const UPLOADS_URL = clean(process.env.VUE_APP_UPLOADS_URL)
 
+if (process.env.VUE_APP_ENV === 'production') {
+  if (!API_BASE) {
+    console.error('❌ ERROR CRÍTICO: VUE_APP_API_BASE_URL no definida en producción')
+    throw new Error('VUE_APP_API_BASE_URL es requerida en producción')
+  }
+  if (!UPLOADS_URL) {
+    console.error('❌ ERROR CRÍTICO: VUE_APP_UPLOADS_URL no definida en producción')
+    throw new Error('VUE_APP_UPLOADS_URL es requerida en producción')
+  }
+}
+
+const baseURL = API_BASE || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo/api/v2' : '')
+const uploadsUrl = UPLOADS_URL || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '')
+
+if (process.env.VUE_APP_ENV !== 'production' && !API_BASE) {
+  console.warn('⚠️ VUE_APP_API_BASE_URL no definida - usando fallback (SOLO DEV)')
+}
+if (process.env.VUE_APP_ENV !== 'production' && !UPLOADS_URL) {
+  console.warn('⚠️ VUE_APP_UPLOADS_URL no definida - usando fallback (SOLO DEV)')
+}
 
 const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: baseURL,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
@@ -20,37 +40,30 @@ api.interceptors.request.use(config => {
   if (API_TOKEN) {
     config.headers.Authorization = `Bearer ${API_TOKEN}`
   }
-
-      // Logging opcional para desarrollo (se desactiva en producción)   REVISAR QUE HACE-----------------------
-    // if (process.env.VUE_APP_ENV !== 'production') {
-    //   console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`)
-    // }      
   return config
 })
 
 api.interceptors.response.use(
   response => response,
   error => {
+    const isProd = process.env.VUE_APP_ENV === 'production'
+    
     if (error.response?.status === 401) {
-      console.error('Token API inválido - Revisar VUE_APP_API_TOKEN en .env')
-       } 
-    else if (error.response?.status === 403) {
-      console.error('[API 403] Acceso denegado - Permisos insuficientes')
+      console.error('❌ Error de autenticación')
+    } else if (error.response?.status === 403) {
+      console.error('❌ Acceso denegado')
     } else if (error.response?.status === 404) {
-      console.warn('Endpoint no encontrado:', error.config.url)
-      
+      if (!isProd) console.warn('Endpoint no encontrado')
     } else if (error.response?.status >= 500) {
-      console.error('Error del servidor API:', error.response.status)
-    }
-    else if (error.code === 'ERR_NETWORK') {
-      console.error('[API Network] Error de red - Verifica tu conexión o CORS:', error.config.url)
+      console.error('❌ Error del servidor')
+    } else if (error.code === 'ERR_NETWORK') {
+      console.error('❌ Error de conexión')
     }
     return Promise.reject(error)
   }
 )
 
-
-api.uploadsUrl = UPLOADS_URL
+api.uploadsUrl = uploadsUrl
 api.clean = clean 
 
 export default api

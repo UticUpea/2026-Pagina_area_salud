@@ -8,48 +8,55 @@
               <br><br>
               <h3 :style="{ color: colors.text }">CONÉCTATE CON NOSOTROS</h3>
               <ul class="follow-us">
-                <li v-if="institucionData?.institucion_facebook?.trim()">
+               
+                <li v-if="institucionData?.institucion_facebook?.trim() && $isSafeLink(institucionData.institucion_facebook)">
                   <a :href="institucionData.institucion_facebook.trim()" 
                      target="_blank" rel="noopener noreferrer"
                      :style="{ color: colors.iconColor }">
                     <i class="fa fa-facebook" aria-hidden="true"></i>
                   </a>
                 </li>
-                <li v-if="institucionData?.institucion_twitter?.trim()">
+                <li v-if="institucionData?.institucion_twitter?.trim() && $isSafeLink(institucionData.institucion_twitter)">
                   <a :href="institucionData.institucion_twitter.trim()" 
                      target="_blank" rel="noopener noreferrer"
                      :style="{ color: colors.iconColor }">
                     <i class="fa fa-twitter" aria-hidden="true"></i>
                   </a>
                 </li>
-                <li v-if="institucionData?.institucion_youtube?.trim()">
+                <li v-if="institucionData?.institucion_youtube?.trim() && $isSafeLink(institucionData.institucion_youtube)">
                   <a :href="institucionData.institucion_youtube.trim()" 
                      target="_blank" rel="noopener noreferrer"
                      :style="{ color: colors.iconColor }">
                     <i class="fa fa-youtube-play" aria-hidden="true"></i>
                   </a>
                 </li>
+                
+              
                 <li v-if="institucionData?.institucion_celular1 && institucionData.institucion_celular1 != 0">
-                  <a :href="'https://wa.me/+591' + String(institucionData.institucion_celular1).replace(/[^0-9]/g, '')" 
+                  <a :href="buildWhatsAppUrl(institucionData.institucion_celular1)" 
                      target="_blank" rel="noopener noreferrer"
                      :style="{ color: colors.iconColor }">
                     <i class="fa fa-whatsapp" aria-hidden="true"></i>
                   </a>
                 </li>
                 <li v-if="institucionData?.institucion_celular2 && institucionData.institucion_celular2 != 0">
-                  <a :href="'https://wa.me/+591' + String(institucionData.institucion_celular2).replace(/[^0-9]/g, '')" 
+                  <a :href="buildWhatsAppUrl(institucionData.institucion_celular2)" 
                      target="_blank" rel="noopener noreferrer"
                      :style="{ color: colors.iconColor }">
                     <i class="fa fa-whatsapp" aria-hidden="true"></i>
                   </a>
                 </li>
-                <li v-if="institucionData?.institucion_correo2?.trim()">
+                
+              
+                <li v-if="institucionData?.institucion_correo2?.trim() && isValidEmail(institucionData.institucion_correo2)">
                   <a :href="'mailto:' + institucionData.institucion_correo2.trim()" 
                      target="_blank" rel="noopener noreferrer"
                      :style="{ color: colors.iconColor }">
                     <i class="fa fa-envelope" aria-hidden="true"></i>
                   </a>
                 </li>
+                
+               
                 <li v-if="institucionData?.institucion_telefono2 && institucionData.institucion_telefono2 != 0">
                   <a :href="'tel:+591' + String(institucionData.institucion_telefono2).replace(/[^0-9]/g, '')" 
                      target="_blank" rel="noopener noreferrer"
@@ -74,7 +81,7 @@
           
           <div class="col-sm-4">
             <div class="footer-logo hidden-xs">
-              <img :src="imageUrl + (institucionData?.institucion_logo || '')" 
+              <img :src="buildSafeImageUrl(institucionData?.institucion_logo)" 
                    alt="logo" width="70" height="70"
                    style="display: inline-block; margin-right: 10px; border-radius: 8px;" />
               <a href="https://utic.upea.bo" target="_blank" rel="noopener noreferrer">
@@ -132,7 +139,12 @@ export default {
     },
     
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
     },
 
     currentYear() { return new Date().getFullYear(); },
@@ -157,7 +169,6 @@ export default {
         };
       }
       
-      // Fallback por defecto
       return {
         primary: '#C00014', secondary: '#FEFEFE', tertiary: '#F1EDEF',
         text: '#FFFFFF', textSecondary: 'rgba(255, 255, 255, 0.8)',
@@ -176,6 +187,29 @@ export default {
   },
   
   methods: {
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
+
+    buildWhatsAppUrl(celular) {
+      if (!celular) return '#';
+      const cleaned = String(celular).replace(/[^0-9]/g, '');
+      return `https://wa.me/+591${cleaned}`;
+    },
+    
+
+    isValidEmail(email) {
+      if (!email) return false;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    },
+    
     getContrastColor(hexColor) {
       if (!hexColor) return '#FFFFFF';
       const color = hexColor.replace('#', '');
@@ -208,7 +242,6 @@ export default {
     //     id: this.institucionData?.institucion_id,
     //     nombre: this.institucionData?.institucion_nombre
     //   });
-
     // }
   }
 };
@@ -344,5 +377,5 @@ export default {
 }
 .color { 
   color: var(--main-color-3, currentColor); 
-  }
+}
 </style>

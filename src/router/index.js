@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// const array = require('./../pages')
 
-// let res = await this.axios.get("/api/cursosAll/" + this.id_carrera);
 const routes = [
   {
     path: '/',
@@ -50,7 +48,7 @@ const routes = [
       },
       {
         path: '/detalleOferta/:idOfer',
-        name: 'detalleOfeta',
+        name: 'detalleOferta',
         component: () => import('@/views/Ofertas/DetalleOferta.vue')
       },
       {
@@ -100,7 +98,7 @@ const routes = [
       },
       {
         path: '/historia',
-        name: 'historiatView',
+        name: 'historiaView',
         component: () => import('@/views/HistoriaView.vue')
       },
     ]
@@ -119,7 +117,24 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    return { top: 0, behavior: 'smooth' };
+  }
 })
 
-export default router
+
+router.beforeEach((to, from, next) => {
+  const isProd = process.env.VUE_APP_ENV === 'production';
+  if (!isProd) {
+
+    console.log(`[Router] Navegando de ${from.path} a ${to.path}`);
+  }
+  next();
+});
+
+export default router;

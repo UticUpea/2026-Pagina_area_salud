@@ -1,10 +1,10 @@
 <template>
   <header>
-
     <div class="container header-middle">
       <div class="row">
         <span class="col-xs-6 col-sm-3">
-          <img :src="imageUrl + (Institucion?.institucion_logo || '')" 
+
+          <img :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
                class="img-responsive" 
                alt="logo" 
                width="100" 
@@ -16,14 +16,15 @@
             <ul class="hidden-xs">
               <li> 
                 <span>Email</span>
-                <a v-if="Institucion?.institucion_correo1?.trim()" 
+
+                <a v-if="isValidEmail(Institucion?.institucion_correo1)" 
                    :href="'mailto:' + Institucion.institucion_correo1.trim()"
                    target="_blank"
                    rel="noopener noreferrer">
                   {{ Institucion.institucion_correo1 }}
                 </a>
                 <br>
-                <a v-if="Institucion?.institucion_correo2?.trim()" 
+                <a v-if="isValidEmail(Institucion?.institucion_correo2)" 
                    :href="'mailto:' + Institucion.institucion_correo2.trim()"
                    target="_blank"
                    rel="noopener noreferrer">
@@ -44,8 +45,8 @@
                 </a>
               </li>
             </ul>
-            
-            <a href="https://servicioadministrador.upea.bo/sign-in" 
+
+            <a :href="loginUrl" 
                target="_blank" 
                rel="noopener noreferrer"
                class="login">
@@ -78,16 +79,44 @@ export default {
   
   computed: {
     ...mapState(["url_api", "MenuConv", "MenuCur", "Institucion", "getter", "Links"]),
-    
+
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
+    },
+    
+
+    loginUrl() {
+      return process.env.VUE_APP_LOGIN_URL?.trim() || 
+        (process.env.VUE_APP_ENV !== 'production' ? 'https://servicioadministrador.upea.bo/sign-in' : '#');
     },
   },
   
   methods: {
+
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+
+    isValidEmail(email) {
+      if (!email || typeof email !== 'string') return false;
+      const cleaned = email.trim();
+
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned);
+    },
+    
     click_m() {
       this.$store.commit("clickLink");
-     // this.$store.commit("idEncrypt");
       this.openMenu();
     },
     
@@ -109,6 +138,11 @@ export default {
     async getLinks() {
       try {
         const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
+
+        if (!idInstitucion && process.env.VUE_APP_ENV === 'production') {
+          console.error('❌ VUE_APP_ID_INSTITUCION no definida en producción');
+          return;
+        }
         const res = await api.get(`/institucion/${idInstitucion}/recursos`);
         
         const links = res.data.linksExternoInterno || [];
@@ -117,14 +151,18 @@ export default {
         this.$store.commit('setLinks', filterLinks);
         
       } catch (error) {
-        console.error('Error cargando Links en TopHeader:', error);
+
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        console.error(isProd ? '❌ Error cargando enlaces' : 'Error cargando Links en TopHeader:', isProd ? '' : error);
         
         try {
-          const res = await api.get(`/linksIntExtAll/${process.env.VUE_APP_ID_INSTITUCION}`);
+          const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
+          if (!idInstitucion) return;
+          const res = await api.get(`/linksIntExtAll/${idInstitucion}`);
           const filterLinks = res.data.filter(link => link.ei_estado == "1");
           this.$store.commit('setLinks', filterLinks);
         } catch (err) {
-          console.error('Fallback failed:', err);
+          if (!isProd) console.error('Fallback failed');
         }
       }
     },

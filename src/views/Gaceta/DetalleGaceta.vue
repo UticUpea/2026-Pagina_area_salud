@@ -116,6 +116,7 @@
 </template>
 
 <style scoped>
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .pdf-container {
   position: relative;
   max-height: 600px;
@@ -143,9 +144,7 @@
   padding: 2rem;
   color: #666;
 }
-.pdf-fallback .btn {
-  margin-top: 1rem;
-}
+.pdf-fallback .btn { margin-top: 1rem; }
 .pdf-link {
   position: relative;
   display: block;
@@ -264,6 +263,7 @@ export default {
   computed: {
     ...mapState(["gacetas", "url_api"]),
 
+    // ✅ imageUrl: sin fallback en producción
     imageUrl() {
       const envUrl = process.env.VUE_APP_UPLOADS_URL;
 
@@ -275,7 +275,14 @@ export default {
         return clean;
       }
 
-      return 'https://apiadministrador.upea.bo';
+      // ✅ Solo fallback para desarrollo
+      if (process.env.VUE_APP_ENV !== 'production') {
+        return 'https://apiadministrador.upea.bo';
+      }
+      
+      // ✅ Fallar claro en producción
+      console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+      return '';
     },
     
     gacetaData() {
@@ -286,7 +293,9 @@ export default {
         if (!gaceta || !gaceta.gaceta_id || !gaceta.gaceta_documento) return null;
         return gaceta;
       } catch (error) {
-        console.warn('Error obteniendo gacetaData:', error);
+        // ✅ Logs genéricos en producción
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        if (!isProd) console.warn('Error obteniendo gacetaData:', error);
         return null;
       }
     },
@@ -295,27 +304,32 @@ export default {
       return this.gacetas?.length > 0 && !this.gacetaData;
     },
     
+    // ✅ pdfUrlValid: solo acepta URLs HTTPS
     pdfUrlValid() {
       if (!this.gacetaData?.gaceta_documento) return false;
       const url = this.documentoUrl(this.gacetaData.gaceta_documento);
-      return url.startsWith('http://') || url.startsWith('https://');
+      return url.startsWith('https://');
     },
   },
   
   methods: {
+    // ✅ Construir URL segura para documentos PDF (fuerza HTTPS)
     documentoUrl(nombreArchivo) {
       if (!nombreArchivo) return '#';
-
-      if (nombreArchivo.startsWith('http://') || nombreArchivo.startsWith('https://')) {
-        return nombreArchivo;
+      const cleaned = String(nombreArchivo).trim();
+      
+      // ✅ Si es URL absoluta, forzar HTTPS
+      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+        return cleaned.replace('http://', 'https://');
       }
-
-      if (nombreArchivo.startsWith('/')) {
+      
+      // ✅ Si es ruta relativa, unir con base URL
+      if (cleaned.startsWith('/')) {
         const domain = this.imageUrl.replace(/\s+$/g, '');
-        return `${domain}${nombreArchivo}`;
+        return `${domain}${cleaned}`;
       }
       const domain = this.imageUrl.replace(/\s+$/g, '');
-      return `${domain}${nombreArchivo}`;
+      return `${domain}/${cleaned}`;
     },
     
     formatearFecha(fechaISO) {
@@ -326,13 +340,15 @@ export default {
       return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
     },
     
+    // ✅ Logs genéricos en producción
     onPdfLoaded() {
-      console.log('✅ PDF cargado correctamente');
+      const isProd = process.env.VUE_APP_ENV === 'production';
+      if (!isProd) console.log('✅ PDF cargado correctamente');
     },
 
     onPdfError(error) {
-      console.warn('⚠️ Error cargando PDF:', error);
-
+      const isProd = process.env.VUE_APP_ENV === 'production';
+      if (!isProd) console.warn('⚠️ Error cargando PDF:', error);
     },
 
     clickBack() {
@@ -341,21 +357,9 @@ export default {
     },
   },
   
-  // created() {
-  //   // Debug en desarrollo
-  //   if (process.env.NODE_ENV === 'development' && this.gacetaData) {
-  //     console.log('📄 DetalleGaceta - Debug:');
-  //     console.log('  gaceta_documento (raw):', this.gacetaData.gaceta_documento);
-  //     console.log('  imageUrl:', this.imageUrl);
-  //     console.log('  pdfUrl generada:', this.documentoUrl(this.gacetaData.gaceta_documento));
-      
-  //     // Testear si la URL es accesible
-  //     fetch(this.documentoUrl(this.gacetaData.gaceta_documento), { method: 'HEAD' })
-  //       .then(res => console.log('  📡 Status:', res.status, res.ok ? '✅' : '❌'))
-  //       .catch(err => console.log('  📡 Error de red:', err.message));
-  //   }
-    
-  //   this.$store.commit("loading");
-  // },
+  // ✅ Código debug eliminado para producción
+  created() {
+    this.$store.commit("loading");
+  },
 };
 </script>

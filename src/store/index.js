@@ -1,20 +1,26 @@
 import { createStore } from 'vuex'
 
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('myTotallySecretKey');
+let cryptr = null
+const CRYPT_KEY = process.env.VUE_APP_CRYPT_KEY
+
+if (CRYPT_KEY && process.env.VUE_APP_ENV !== 'production') {
+  try {
+    const Cryptr = require('cryptr')
+    cryptr = new Cryptr(CRYPT_KEY)
+  } catch (e) {
+    console.warn('⚠️ cryptr no disponible')
+  }
+}
 
 export default createStore({
   state: {
-    url_api: (process.env.VUE_APP_API_ROOT || 'https://apiadministrador.upea.bo').trim(),
+    // ✅ Sin fallbacks
+    url_api: process.env.VUE_APP_API_ROOT?.trim() || '',
     getter: true,
-
     MenuConv: [],
     MenuCur: [],
-
     Links: [],
-
     Institucion: {},
-
     convocatorias: [],
     cursos: [],
     servicios: [],
@@ -23,14 +29,13 @@ export default createStore({
     gacetas: [],
     eventos: [],
     videos: [],
-
+    autoridades: [],
     statusImg: true,
   },
   
   getters: {
     getUrlApi: (state) => state.url_api,
     getInstitucion: (state) => state.Institucion,
-
     convocatoriasCountByType: (state) => (tipo) => {
       return state.convocatorias.filter(c => 
         c.tipo_conv_comun?.tipo_conv_comun_titulo === tipo && c.con_estado === '1'
@@ -44,7 +49,6 @@ export default createStore({
   },
   
   mutations: {
-
     loadOn() {
       const preloader = document.querySelector("#preloader");
       if (preloader) preloader.style.visibility = "visible";
@@ -113,7 +117,6 @@ export default createStore({
       state.autoridades = Array.isArray(data) ? data : [];
     },
     
-    // ===== UTILS =====
     setGetter(state, value) {
       state.getter = value;
     },
@@ -123,16 +126,33 @@ export default createStore({
       state.getter = true;
     },
     
-    idEncrypt() {
-      console.log(cryptr.encrypt("hola"));
+    idEncrypt(state, text) {
+      if (!cryptr) {
+        console.warn('⚠️ Encriptación no disponible')
+        return text
+      }
+      if (process.env.VUE_APP_ENV === 'production') {
+        console.warn('⚠️ No usar encriptación frontend en producción')
+        return text
+      }
+      try {
+        return cryptr.encrypt(String(text))
+      } catch (e) {
+        console.error('Error encriptando:', e)
+        return text
+      }
     }
   },
   
   actions: {
-
+    initStore({ state }) {
+      if (process.env.VUE_APP_ENV === 'production') {
+        if (!state.url_api) {
+          console.error('❌ ERROR: VUE_APP_API_ROOT no definida en producción')
+        }
+      }
+    }
   },
   
-  modules: {
-
-  }
+  modules: {}
 })

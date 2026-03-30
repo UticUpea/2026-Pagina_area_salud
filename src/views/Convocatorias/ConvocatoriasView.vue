@@ -42,8 +42,9 @@
                 @click="$store.commit('clickLink')"
               >
                 <div class="image-container">
+                  <!-- ✅ Imagen con URL segura -->
                   <img 
-                    :src="imageUrl + conv.con_foto_portada" 
+                    :src="buildSafeImageUrl(conv.con_foto_portada)" 
                     :alt="conv.con_titulo || 'Imagen de convocatoria'"
                     class="img-responsive" 
                     style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px;"
@@ -116,25 +117,14 @@
 </template>
 
 <style scoped>
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
-
-.text-muted {
-  color: #6c757d;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-5 {
-  padding: 3rem 0;
-}
-
-.mt-4 {
-  margin-top: 1.5rem;
-}
+.text-muted { color: #6c757d; }
+.text-center { text-align: center; }
+.py-5 { padding: 3rem 0; }
+.mt-4 { margin-top: 1.5rem; }
 
 /* Paginación */
 .pagination.blue {
@@ -145,7 +135,6 @@
   margin: 0;
   justify-content: center;
 }
-
 .pagination.blue li a {
   display: block;
   padding: 8px 14px;
@@ -155,23 +144,21 @@
   text-decoration: none;
   transition: all 0.2s;
 }
-
 .pagination.blue li.active a {
   background: var(--main-color, #c00014);
   color: #fff;
   border-color: var(--main-color, #c00014);
 }
-
 .pagination.blue li.disable a {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .pagination.blue li a:hover:not(.disable) {
   background: var(--main-color, #c00014);
   color: #fff;
 }
 
+/* Imágenes */
 .image-container {
   width: 100%;
   height: 300px;
@@ -179,7 +166,6 @@
   border-radius: 8px;
   margin-bottom: 1rem;
 }
-
 img.img-responsive {
   width: 100%;
   height: 100%;
@@ -196,17 +182,13 @@ img.img-responsive {
   flex-wrap: wrap;
   align-items: center;
 }
-
 .post-detail li {
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
-.post-detail .bold {
-  font-weight: 600;
-}
+.post-detail .bold { font-weight: 600; }
 
 /* Leer más */
 .read-more {
@@ -219,27 +201,19 @@ img.img-responsive {
   margin-top: 0.5rem;
   transition: gap 0.2s;
 }
-
 .read-more:hover {
   gap: 0.6rem;
   color: #a00010;
 }
+.read-more .icon-play-icon { font-size: 0.9rem; }
 
-.read-more .icon-play-icon {
-  font-size: 0.9rem;
-}
-
-.grid-item {
-  margin-bottom: 1.5rem;
-}
-
+.grid-item { margin-bottom: 1.5rem; }
 .grid-item .inner {
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 1rem;
   transition: box-shadow 0.2s;
 }
-
 .grid-item .inner:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -254,7 +228,6 @@ export default {
   
   data() {
     return {
-      // Paginación
       NUM_RESULTS: 4,
       pag: 1,
     };
@@ -267,8 +240,14 @@ export default {
   computed: {
     ...mapState(["convocatorias", "MenuConv", "url_api"]),
     
+    // ✅ imageUrl: sin fallback en producción
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
     },
     
     tipoConvocatoria() {
@@ -301,6 +280,19 @@ export default {
   },
   
   methods: {
+    // ✅ Construir URL de imagen segura
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      // Si ya es URL absoluta, forzar HTTPS
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      // Si es ruta relativa, unir con base URL
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
     formatearFecha(fechaISO) {
       if (!fechaISO) return 'Fecha no disponible';
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];

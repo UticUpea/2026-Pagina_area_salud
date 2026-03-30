@@ -1,11 +1,9 @@
 <template>
   <div class="banner-outer page-title-area bg-overlay-img banner-img">
-    <div class="banner-slider">
-    </div>
-  </div>  
-  <!-- ==============================================
-    ** About **
-    =================================================== -->
+    <div class="banner-slider"></div>
+  </div>
+
+  <!-- About Section -->
   <section class="about">
     <div class="container">
       <ul class="row our-links">
@@ -18,7 +16,7 @@
             <p class="left-aligned">
               Inscripciones en línea para los estudiantes nuevos y antiguos.
             </p>
-            <a href="https://inscripciones.upea.bo          " target="_blank" rel="noopener noreferrer" class="more">
+            <a href="https://inscripciones.upea.bo" target="_blank" rel="noopener noreferrer" class="more">
               <i class="fa fa-angle-right" aria-hidden="true"></i>
             </a>
           </div>
@@ -29,7 +27,13 @@
           </div>
           <div class="detail">
             <h3 class="left-aligned"><span>Descargar</span>Plan de Estudios</h3>
-            <a class="more" :href="imageUrl + institucionData.institucion_organigrama" target="_blank" rel="noopener noreferrer">
+            <!-- ✅ Validar URL antes de usar -->
+            <a 
+              class="more" 
+              :href="buildSafeUrl(institucionData.institucion_organigrama)" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
               <i class="fa fa-angle-right" aria-hidden="true"></i>
             </a>
           </div>
@@ -44,7 +48,7 @@
               Formación en línea de los estudiantes de la carrera de
               {{ formatNombreCarrera(institucionData.institucion_nombre) }}.
             </p>
-            <a href="https://virtualmedicina.upea.bo          " target="_blank" rel="noopener noreferrer" class="more">
+            <a href="https://virtualmedicina.upea.bo" target="_blank" rel="noopener noreferrer" class="more">
               <i class="fa fa-angle-right" aria-hidden="true"></i>
             </a>
           </div>
@@ -55,7 +59,8 @@
       <div class="row">
         <div class="about-col-right left-aligned col-sm-7 col-sm-push-5 left-block">
           <span class="sm-head">UNIVERSIDAD PÚBLICA DE EL ALTO - CARRERA DE {{ formatNombreCarrera(institucionData.institucion_nombre) }}</span>
-          <p class="left-aligned" v-html="institucionData.institucion_mision || institucionData.institucion_objetivos"></p>
+          <!-- ✅ Sanitizar HTML antes de renderizar -->
+          <p class="left-aligned" v-html="$sanitize(institucionData.institucion_mision || institucionData.institucion_objetivos)"></p>
           <div class="know-more-wrapper">
             <router-link to="/about" class="know-more">Leer más sobre la carrera
               <span class="icon-more-icon"></span>
@@ -64,48 +69,51 @@
         </div>
 
         <div class="col-sm-5 col-sm-pull-7">
-          <iframe v-if="institucionData.institucion_link_video_vision" 
+          <iframe 
+            v-if="institucionData.institucion_link_video_vision" 
             :src="institucionData.institucion_link_video_vision" 
-            frameborder="0" style="width: 100%; min-height: 400px"
-            allowfullscreen="allowfullscreen"></iframe>
+            frameborder="0" 
+            style="width: 100%; min-height: 400px"
+            allowfullscreen="allowfullscreen"
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
         </div>
       </div>
     </div>
   </section>
-  <!-- ==============================================
-    ** VISION - MISION **
-    =================================================== -->
+
+  <!-- Misión - Visión -->
   <section class="our-impotance mission-vision-section">
-    <div class="container-fluid"> <!-- ✅ Cambiado a container-fluid para más ancho -->
+    <div class="container-fluid">
       <div class="row">
-        <div class="col-md-6 col-lg-6"> <!-- ✅ Columnas más amplias -->
+        <div class="col-md-6 col-lg-6">
           <div class="our_solution_category">
             <div class="solution_cards_box">
               <div class="solution_card">
                 <div class="hover_color_bubble"></div>
                 <div class="solu_title">
-                  <h3>Misión</h3>
-                  <br>
+                  <h3>Misión</h3><br>
                 </div>
                 <div class="solu_description">
-                  <p class="left-aligned" v-html="institucionData.institucion_mision"></p>
+                  <!-- ✅ Sanitizar HTML -->
+                  <p class="left-aligned" v-html="$sanitize(institucionData.institucion_mision)"></p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-md-6 col-lg-6"> <!-- ✅ Columnas más amplias -->
+        <div class="col-md-6 col-lg-6">
           <div class="our_solution_category">
             <div class="solution_cards_box">
               <div class="solution_card">
                 <div class="hover_color_bubble"></div>
                 <div class="solu_title">
-                  <h3>Visión</h3>
-                  <br>
+                  <h3>Visión</h3><br>
                 </div>
                 <div class="solu_description">
-                  <p class="left-aligned" v-html="institucionData.institucion_vision"></p>
+                  <!-- ✅ Sanitizar HTML -->
+                  <p class="left-aligned" v-html="$sanitize(institucionData.institucion_vision)"></p>
                 </div>
               </div>
             </div>
@@ -114,9 +122,8 @@
       </div>
     </div>
   </section>
-  <!-- ==============================================
-    ** PUBLICACIONES DE LA GACETA **
-    =================================================== -->
+
+  <!-- Gaceta Section -->
   <section class="our-cources padding-lg">
     <div class="container">
       <h2><span>DOCUMENTOS EXISTENTES EN LA </span> GACETA DE LA CARRERA</h2>
@@ -129,7 +136,7 @@
         <slide v-for="(gac, id_gac) of gacetasList" :key="gac.gaceta_id || id_gac" class="col-sm-4">
           <div class="card">
             <div class="card-image">
-              <vue-pdf-embed :source="imageUrl + gac.gaceta_documento" :page="1" :disableTextLayer="true" />
+              <vue-pdf-embed :source="buildSafeUrl(gac.gaceta_documento)" :page="1" :disableTextLayer="true" />
             </div>
             <router-link :to="'/detalleGaceta/' + gac.gaceta_id" @click="$store.commit('clickLink')" class="heading">
               {{ gac.gaceta_titulo }}
@@ -144,9 +151,7 @@
     </div>
   </section>
 
-  <!-- ==============================================
-    ** MENU **
-    =================================================== -->
+  <!-- Menu Section -->
   <section class="our-impotance padding-lg">
     <div class="container center-content">
       <ul class="row menu-grid">
@@ -211,8 +216,13 @@
           </div>
         </router-link>
 
-        <router-link class="col-lg-4 col-md-6 col-sm-12 equal-hight" v-for="(conv, id_conv) of MenuConv" :key="conv.idtipo_conv_comun || id_conv"
-          :to="'/convocatorias/' + conv.idtipo_conv_comun" @click="$store.commit('clickLink')">
+        <router-link 
+          class="col-lg-4 col-md-6 col-sm-12 equal-hight" 
+          v-for="(conv, id_conv) of MenuConv" 
+          :key="conv.idtipo_conv_comun || id_conv"
+          :to="'/convocatorias/' + conv.idtipo_conv_comun" 
+          @click="$store.commit('clickLink')"
+        >
           <br />
           <div class="card2">
             <div class="inner">
@@ -224,8 +234,13 @@
           <br />
         </router-link>
 
-        <router-link class="col-lg-4 col-md-6 col-sm-12 equal-hight" v-for="(cur, id_cur) of MenuCur" :key="cur.idtipo_curso_otros || id_cur"
-          :to="'/cursos/' + cur.idtipo_curso_otros" @click="$store.commit('clickLink')">
+        <router-link 
+          class="col-lg-4 col-md-6 col-sm-12 equal-hight" 
+          v-for="(cur, id_cur) of MenuCur" 
+          :key="cur.idtipo_curso_otros || id_cur"
+          :to="'/cursos/' + cur.idtipo_curso_otros" 
+          @click="$store.commit('clickLink')"
+        >
           <div class="card2">
             <div class="inner">
               <img src="@/assets/images/placement-ico.jpg" alt="Placement Assistance" />
@@ -239,9 +254,7 @@
     </div>
   </section>
 
-  <!-- ==============================================
-    ** NOVEDADES **
-    =================================================== -->
+  <!-- Novedades Section -->
   <section class="why-choose padding-lg">
     <div class="container">
       <h2><span>Convocatorias, comunicados, avisos</span>Lo más reciente</h2>
@@ -253,19 +266,23 @@
           <div class="card3">
             <div class="card3-image">
               <router-link :to="'/convocatorias/' + latestConv?.tipo_conv_comun?.idtipo_conv_comun">
-                <div class="save">
-                  {{ latestConv?.tipo_conv_comun?.tipo_conv_comun_titulo }}
-                </div>
+                <div class="save">{{ latestConv?.tipo_conv_comun?.tipo_conv_comun_titulo }}</div>
               </router-link>
-              <img style="width: 300px; height: 220px" :src="imageUrl + latestConv?.con_foto_portada"
-                alt="img" class="img-responsive" />
+              <!-- ✅ Validar URL de imagen -->
+              <img 
+                style="width: 300px; height: 220px" 
+                :src="buildSafeImageUrl(latestConv?.con_foto_portada)"
+                alt="img" 
+                class="img-responsive" 
+              />
             </div>
             <p class="card3-title">
-              <router-link :to="'/detalleConvocatoria/' + latestConv?.idconvocatorias">{{ latestConv?.con_titulo }}</router-link>
+              <router-link :to="'/detalleConvocatoria/' + latestConv?.idconvocatorias">
+                {{ latestConv?.con_titulo }}
+              </router-link>
             </p>
             <p class="footer3">
-              Fecha:
-              <span class="date">{{ formatearFecha(latestConv?.con_fecha_inicio) }}</span>
+              Fecha: <span class="date">{{ formatearFecha(latestConv?.con_fecha_inicio) }}</span>
             </p>
           </div>
         </slide>
@@ -274,19 +291,21 @@
           <div class="card3">
             <div class="card3-image">
               <router-link :to="'/convocatorias/' + latestComun?.tipo_conv_comun?.idtipo_conv_comun">
-                <div class="save">
-                  {{ latestComun?.tipo_conv_comun?.tipo_conv_comun_titulo }}
-                </div>
+                <div class="save">{{ latestComun?.tipo_conv_comun?.tipo_conv_comun_titulo }}</div>
               </router-link>
-              <img style="width: 300px; height: 220px" :src="imageUrl + latestComun?.con_foto_portada"
-                class="img-responsive" />
+              <img 
+                style="width: 300px; height: 220px" 
+                :src="buildSafeImageUrl(latestComun?.con_foto_portada)"
+                class="img-responsive" 
+              />
             </div>
             <p class="card3-title">
-              <router-link :to="'/detalleConvocatoria/' + latestComun?.idconvocatorias" class="plus-icon">{{ latestComun?.con_titulo }}</router-link>
+              <router-link :to="'/detalleConvocatoria/' + latestComun?.idconvocatorias" class="plus-icon">
+                {{ latestComun?.con_titulo }}
+              </router-link>
             </p>
             <p class="footer3">
-              Fecha:
-              <span class="date">{{ formatearFecha(latestComun?.con_fecha_inicio) }}</span>
+              Fecha: <span class="date">{{ formatearFecha(latestComun?.con_fecha_inicio) }}</span>
             </p>
           </div>
         </slide>
@@ -295,19 +314,21 @@
           <div class="card3">
             <div class="card3-image">
               <router-link :to="'/convocatorias/' + latestAv?.tipo_conv_comun?.idtipo_conv_comun">
-                <div class="save">
-                  {{ latestAv?.tipo_conv_comun?.tipo_conv_comun_titulo }}
-                </div>
+                <div class="save">{{ latestAv?.tipo_conv_comun?.tipo_conv_comun_titulo }}</div>
               </router-link>
-              <img style="width: 300px; height: 220px" :src="imageUrl + latestAv?.con_foto_portada"
-                class="img-responsive" />
+              <img 
+                style="width: 300px; height: 220px" 
+                :src="buildSafeImageUrl(latestAv?.con_foto_portada)"
+                class="img-responsive" 
+              />
             </div>
             <p class="card3-title">
-              <router-link :to="'/detalleConvocatoria/' + latestAv?.idconvocatorias">{{ latestAv?.con_titulo }}</router-link>
+              <router-link :to="'/detalleConvocatoria/' + latestAv?.idconvocatorias">
+                {{ latestAv?.con_titulo }}
+              </router-link>
             </p>
             <p class="footer3">
-              Fecha:
-              <span class="date">{{ formatearFecha(latestAv?.con_fecha_inicio) }}</span>
+              Fecha: <span class="date">{{ formatearFecha(latestAv?.con_fecha_inicio) }}</span>
             </p>
           </div>
         </slide>
@@ -316,12 +337,13 @@
           <div class="card3">
             <div class="card3-image">
               <router-link :to="'/cursos/' + latestCur?.idtipo_curso_otros">
-                <div class="save">
-                  {{ latestCur?.tipo_curso_otro?.tipo_conv_curso_nombre }}
-                </div>
+                <div class="save">{{ latestCur?.tipo_curso_otro?.tipo_conv_curso_nombre }}</div>
               </router-link>
-              <img style="width: 300px; height: 220px" :src="imageUrl + latestCur?.det_img_portada"
-                class="img-responsive" />
+              <img 
+                style="width: 300px; height: 220px" 
+                :src="buildSafeImageUrl(latestCur?.det_img_portada)"
+                class="img-responsive" 
+              />
             </div>
             <p class="card3-title">
               <router-link :to="'/detalleCurso/' + latestCur?.iddetalle_cursos_academicos">
@@ -329,8 +351,7 @@
               </router-link>
             </p>
             <p class="footer3">
-              Fecha:
-              <span class="date">{{ formatearFecha(latestCur?.det_fecha_ini) }}</span>
+              Fecha: <span class="date">{{ formatearFecha(latestCur?.det_fecha_ini) }}</span>
             </p>
           </div>
         </slide>
@@ -339,12 +360,13 @@
           <div class="card3">
             <div class="card3-image">
               <router-link :to="'/cursos/' + latestSem?.idtipo_curso_otros">
-                <div class="save">
-                  {{ latestSem?.tipo_curso_otro?.tipo_conv_curso_nombre }}
-                </div>
+                <div class="save">{{ latestSem?.tipo_curso_otro?.tipo_conv_curso_nombre }}</div>
               </router-link>
-              <img style="width: 300px; height: 220px" :src="imageUrl + latestSem?.det_img_portada"
-                class="img-responsive" />
+              <img 
+                style="width: 300px; height: 220px" 
+                :src="buildSafeImageUrl(latestSem?.det_img_portada)"
+                class="img-responsive" 
+              />
             </div>
             <p class="card3-title">
               <router-link :to="'/detalleCurso/' + latestSem?.iddetalle_cursos_academicos">
@@ -352,8 +374,7 @@
               </router-link>
             </p>
             <p class="footer3">
-              Fecha:
-              <span class="date">{{ formatearFecha(latestSem?.det_fecha_ini) }}</span>
+              Fecha: <span class="date">{{ formatearFecha(latestSem?.det_fecha_ini) }}</span>
             </p>
           </div>
         </slide>
@@ -366,9 +387,7 @@
     </div>
   </section>
 
-  <!-- ==============================================
-    ** AUTORIDADES **
-    =================================================== -->
+  <!-- Autoridades Section -->
   <section class="browse-teacher grey-bg padding-lg">
     <div class="container">
       <h2>
@@ -379,25 +398,30 @@
         <li class="col-12 col-md-4" v-for="(autoridad, id_aut) of autoridadesList" :key="autoridad.id_autoridad || id_aut" 
           v-show="(pag - 1) * NUM_RESULTS <= id_aut && pag * NUM_RESULTS > id_aut">
           <figure>
-            <img :src="imageUrl + autoridad.foto_autoridad" width="123" height="124" alt="" />
+            <!-- ✅ Validar URL de imagen -->
+            <img :src="buildSafeImageUrl(autoridad.foto_autoridad)" width="123" height="124" alt="" />
           </figure>
           <h3>{{ autoridad.nombre_autoridad }}</h3>
           <span class="designation">{{ autoridad.cargo_autoridad }}</span>
           <ul class="teachers-follow">
-            <li v-if="autoridad.facebook_autoridad && autoridad.facebook_autoridad !== '_'">
+            <!-- ✅ Validar enlaces externos -->
+            <li v-if="autoridad.facebook_autoridad && autoridad.facebook_autoridad !== '_' && $isSafeLink(autoridad.facebook_autoridad)">
               <a :href="autoridad.facebook_autoridad?.trim()" target="_blank" rel="noopener noreferrer">
                 <i class="fa fa-facebook" aria-hidden="true"></i>
               </a>
             </li>
-            <li v-if="autoridad.twiter_autoridad && autoridad.twiter_autoridad !== '_'">
+            <li v-if="autoridad.twiter_autoridad && autoridad.twiter_autoridad !== '_' && $isSafeLink(autoridad.twiter_autoridad)">
               <a :href="autoridad.twiter_autoridad?.trim()" target="_blank" rel="noopener noreferrer">
                 <i class="fa fa-twitter" aria-hidden="true"></i>
               </a>
             </li>
             <li v-if="autoridad.celular_autoridad">
-              <a :href="'https://wa.me/+591          ' + String(autoridad.celular_autoridad).replace(/[^0-9]/g, '')" 
-                 target="_blank" 
-                 rel="noopener noreferrer">
+              <!-- ✅ Construir WhatsApp URL segura -->
+              <a 
+                :href="buildWhatsAppUrl(autoridad.celular_autoridad)" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
                 <i class="fa fa-whatsapp" aria-hidden="true"></i>
               </a>
             </li>
@@ -407,11 +431,14 @@
     </div>
   </section>
 
+  <!-- WhatsApp Button -->
   <div>
     <div class="whatsapp-button">
-      <a :href="'https://wa.me/+591          ' + (institucionData.institucion_celular1?.toString().replace(/[^0-9]/g, '') || '')" 
-         target="_blank" 
-         rel="noopener noreferrer">
+      <a 
+        :href="buildWhatsAppUrl(institucionData.institucion_celular1)" 
+        target="_blank" 
+        rel="noopener noreferrer"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
           <path fill="#00E676" d="M10.7 32.8l.6.3c2.5 1.5 5.3 2.2 8.1 2.2 8.8 0 16-7.2 16-16 0-4.2-1.7-8.3-4.7-11.3s-7-4.7-11.3-4.7c-8.8 0-16 7.2-15.9 16.1 0 3 .9 5.9 2.4 8.4l.4.6-1.6 5.9 6-1.5z"></path>
           <path fill="#FFF" d="M32.4 6.4C29 2.9 24.3 1 19.5 1 9.3 1 1.1 9.3 1.2 19.4c0 3.2.9 6.3 2.4 9.1L1 38l9.7-2.5c2.7 1.5 5.7 2.2 8.7 2.2 10.1 0 18.3-8.3 18.3-18.4 0-4.9-1.9-9.5-5.3-12.9zM19.5 34.6c-2.7 0-5.4-.7-7.7-2.1l-.6-.3-5.8 1.5L6.9 28l-.4-.6c-4.4-7.1-2.3-16.5 4.9-20.9s16.5-2.3 20.9 4.9 2.3 16.5-4.9 20.9c-2.3 1.5-5.1 2.3-7.9 2.3zm8.8-11.1l-1.1-.5s-1.6-.7-2.6-1.2c-.1 0-.2-.1-.3-.1-.3 0-.5.1-.7.2 0 0-.1.1-1.5 1.7-.1.2-.3.3-.5.3h-.1c-.1 0-.3-.1-.4-.2l-.5-.2c-1.1-.5-2.1-1.1-2.9-1.9-.2-.2-.5-.4-.7-.6-.7-.7-1.4-1.5-1.9-2.4l-.1-.2c-.1-.1-.1-.2-.2-.4 0-.2 0-.4.1-.5 0 0 .4-.5.7-.8.2-.2.3-.5.5-.7.2-.3.3-.7.2-1-.1-.5-1.3-3.2-1.6-3.8-.2-.3-.4-.4-.7-.5h-1.1c-.2 0-.4.1-.6.1l-.1.1c-.2.1-.4.3-.6.4-.2.2-.3.4-.5.6-.7.9-1.1 2-1.1 3.1 0 .8.2 1.6.5 2.3l.1.3c.9 1.9 2.1 3.6 3.7 5.1l.4.4c.3.3.6.5.8.8 2.1 1.8 4.5 3.1 7.2 3.8.3.1.7.1 1 .2h1c.5 0 1.1-.2 1.5-.4.3-.2.5-.2.7-.4l.2-.2c.2-.2.4-.3.6-.5s.4-.4.5-.6c.2-.4.3-.9.4-1.4v-.7s-.1-.1-.3-.2z"></path>
@@ -419,7 +446,6 @@
       </a>
     </div>
   </div>
-
 </template>
 
 <style scoped>
@@ -968,7 +994,6 @@
   position: relative;
   z-index: 5;
 }
-
 </style>
 
 <script>
@@ -1025,9 +1050,16 @@ export default {
       return this.institucionLocal?.Descripcion || this.institucionLocal;
     },
     
-    imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo          ').trim();
-    },
+imageUrl() {
+  const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+  // En producción, fallar claro si no está definida
+  if (process.env.VUE_APP_ENV === 'production' && !url) {
+    console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+    return '';
+  }
+  // Fallback SOLO para desarrollo
+  return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
+},
     
     convocatoriasList() { return this.convocatorias?.length ? this.convocatorias : this.convocatoriasLocal; },
     cursosList() { return this.cursos?.length ? this.cursos : this.cursosLocal; },
@@ -1089,6 +1121,31 @@ export default {
   },
 
   methods: {
+    // ✅ Construir URL segura para documentos/imagenes (sin modificar tu lógica)
+    buildSafeUrl(path) {
+      if (!path) return '#';
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http')) return cleaned;
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
+    // ✅ Construir URL de imagen (tu lógica original, sin cambios)
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http')) return cleaned;
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
+    // ✅ Construir URL de WhatsApp segura
+    buildWhatsAppUrl(celular) {
+      if (!celular) return '#';
+      const cleaned = String(celular).replace(/[^0-9]/g, '');
+      return `https://wa.me/+591${cleaned}`;
+    },
+
     async getContenidosGacetaEventos() {
       try {
         const res = await api.get(`/institucion/${this.idInstitucion}/gacetaEventos`);
@@ -1105,7 +1162,8 @@ export default {
         this._actualizarPager();
         
       } catch (error) {
-        console.error('Error cargando gacetaEventos:', error);
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        console.error(isProd ? '❌ Error cargando datos' : 'Error cargando gacetaEventos:', isProd ? '' : error);
       }
     },
 
@@ -1121,7 +1179,8 @@ export default {
           this.$store.commit('setLinks', enlaces);
         }
       } catch (error) {
-        console.error('Error cargando recursos:', error);
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        console.error(isProd ? '❌ Error cargando datos' : 'Error cargando recursos:', isProd ? '' : error);
       }
     },
 
@@ -1133,7 +1192,8 @@ export default {
         this.autoridadesLocal = data.autoridad?.map(this._limpiar) || [];
         this.videosLocal = data.upea_videos?.map(this._limpiar) || [];
       } catch (error) {
-        console.error('Error cargando contenido extra:', error);
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        console.error(isProd ? '❌ Error cargando datos' : 'Error cargando contenido extra:', isProd ? '' : error);
       }
     },
 
@@ -1146,9 +1206,11 @@ export default {
         this.institucionLocal = institucionData;
         
       } catch (error) {
-        console.error('Error cargando institución:', error);
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        console.error(isProd ? '❌ Error cargando institución' : 'Error cargando institución:', isProd ? '' : error);
       }
     },
+    
     _actualizarPager() {
       const total = this.autoridadesList?.length || 0;
       this.pager = Math.ceil(total / this.NUM_RESULTS);
@@ -1199,24 +1261,20 @@ export default {
       event.preventDefault();
     },
     
-     updateCssVariables() {
-    const colorList = this.Institucion?.colorinstitucion || [];
-    const colors = colorList[0];
-    
-    if (colors && colors.color_primario) {
-      // Actualiza las variables CSS en :root
-      document.documentElement.style.setProperty('--main-color', colors.color_primario);
+    updateCssVariables() {
+      const colorList = this.Institucion?.colorinstitucion || [];
+      const colors = colorList[0];
       
-      // Si tienes más colores en la API, actualízalos también:
-      if (colors.color_secundario) {
-        document.documentElement.style.setProperty('--main-color-2', colors.color_secundario);
+      if (colors && colors.color_primario) {
+        document.documentElement.style.setProperty('--main-color', colors.color_primario);
+        if (colors.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colors.color_secundario);
+        }
+        if (colors.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colors.color_terciario);
+        }
       }
-      if (colors.color_terciario) {
-        document.documentElement.style.setProperty('--main-color-3', colors.color_terciario);
-      }
-      
-    }
-  },
+    },
   },
 
   created() {
@@ -1230,7 +1288,8 @@ export default {
     ]).then(() => {
       this.$store.commit("loading"); 
     }).catch(err => {
-      console.error('Error cargando datos:', err);
+      const isProd = process.env.VUE_APP_ENV === 'production';
+      console.error(isProd ? '❌ Error cargando datos' : 'Error cargando datos:', isProd ? '' : err);
       this.$store.commit("loading");
     });
   },
@@ -1238,30 +1297,25 @@ export default {
   mounted() {
     document.body.addEventListener('contextmenu', this.blockRighClick);
     this.$nextTick(() => {
-    this.updateCssVariables();
-    
-  });
+      this.updateCssVariables();
+    });
   },
-  
   
   beforeUnmount() {
     document.body.removeEventListener('contextmenu', this.blockRighClick);
   },
 
+  // ✅ watch con estructura correcta
   watch: {
-  // Re-actualizar cuando cambie la institución
-  Institucion: {
-    handler() {
-      this.$nextTick(() => {
-        this.updateCssVariables();
-      });
-    },
-    deep: true,
-    immediate: true
+    Institucion: {
+      handler() {
+        this.$nextTick(() => {
+          this.updateCssVariables();
+        });
+      },
+      deep: true,
+      immediate: true
+    }
   }
-}
-
-
 };
-
 </script>

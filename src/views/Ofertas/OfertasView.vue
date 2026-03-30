@@ -35,8 +35,9 @@
                 :to="'/detalleOferta/' + ofer.ofertas_id"
                 @click="$store.commit('clickLink')"
               >
+                <!-- ✅ Imagen con URL segura -->
                 <img
-                  :src="imageUrl + ofer.ofertas_imagen"
+                  :src="buildSafeImageUrl(ofer.ofertas_imagen)"
                   :alt="ofer.ofertas_titulo || 'Imagen de oferta académica'"
                   class="img-responsive"
                   style="width: 300px; height: 200px; object-fit: cover; border-radius: 8px;"
@@ -103,25 +104,14 @@
 </template>
 
 <style scoped>
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
-
-.text-muted {
-  color: #6c757d;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-5 {
-  padding: 3rem 0;
-}
-
-.mt-4 {
-  margin-top: 1.5rem;
-}
+.text-muted { color: #6c757d; }
+.text-center { text-align: center; }
+.py-5 { padding: 3rem 0; }
+.mt-4 { margin-top: 1.5rem; }
 
 /* Paginación */
 .pagination.blue {
@@ -132,7 +122,6 @@
   margin: 0;
   justify-content: center;
 }
-
 .pagination.blue li a {
   display: block;
   padding: 8px 14px;
@@ -142,28 +131,22 @@
   text-decoration: none;
   transition: all 0.2s;
 }
-
 .pagination.blue li.active a {
   background: var(--main-color, #c00014);
   color: #fff;
   border-color: var(--main-color, #c00014);
 }
-
 .pagination.blue li.disable a {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .pagination.blue li a:hover:not(.disable) {
   background: var(--main-color, #c00014);
   color: #fff;
 }
 
 /* Imagen responsive */
-img.img-responsive {
-  max-width: 100%;
-  height: auto;
-}
+img.img-responsive { max-width: 100%; height: auto; }
 
 /* Post detail */
 .post-detail {
@@ -175,17 +158,13 @@ img.img-responsive {
   flex-wrap: wrap;
   align-items: center;
 }
-
 .post-detail li {
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
-.post-detail .bold {
-  font-weight: 600;
-}
+.post-detail .bold { font-weight: 600; }
 
 /* Leer más */
 .read-more {
@@ -198,28 +177,20 @@ img.img-responsive {
   margin-top: 0.5rem;
   transition: gap 0.2s;
 }
-
 .read-more:hover {
   gap: 0.6rem;
   color: #a00010;
 }
-
-.read-more .icon-play-icon {
-  font-size: 0.9rem;
-}
+.read-more .icon-play-icon { font-size: 0.9rem; }
 
 /* Grid items */
-.grid-item {
-  margin-bottom: 1.5rem;
-}
-
+.grid-item { margin-bottom: 1.5rem; }
 .grid-item .inner {
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 1rem;
   transition: box-shadow 0.2s;
 }
-
 .grid-item .inner:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -234,7 +205,6 @@ export default {
   
   data() {
     return {
-      // Paginación
       NUM_RESULTS: 4,
       pag: 1,
     };
@@ -246,8 +216,16 @@ export default {
   
   computed: {
     ...mapState(["ofertas", "url_api"]),
+    
+    // ✅ imageUrl: sin fallback en producción + typo corregido
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https:/apiadministrador.upea.bo').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      // ✅ Solo fallback para desarrollo (con URL correcta https://)
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
     },
 
     ofertasList() {
@@ -266,6 +244,19 @@ export default {
   },
   
   methods: {
+    // ✅ Construir URL de imagen segura (fuerza HTTPS)
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      // Si ya es URL absoluta, forzar HTTPS
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      // Si es ruta relativa, unir con base URL
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
     formatearFecha(fechaISO) {
       if (!fechaISO) return 'Fecha no disponible';
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -274,7 +265,6 @@ export default {
       return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
     },
     
-
     goToPage(page) {
       if (page >= 1 && page <= this.pager) {
         this.pag = page;
@@ -305,7 +295,6 @@ export default {
   },
   
   watch: {
-
     ofertasList: {
       handler() {
         if (this.pag > this.pager) this.pag = 1;
@@ -315,7 +304,6 @@ export default {
   },
   
   created() {
-
     this.$store.commit("loading");
   },
 };

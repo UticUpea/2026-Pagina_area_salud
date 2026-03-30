@@ -4,7 +4,6 @@
       <h3>Categorías</h3>
       <ul class="left-aligned">
 
-        <!-- Convocatorias -->
         <li v-for="(conv, id_conv) of MenuConv" :key="conv.idtipo_conv_comun || id_conv">
           <router-link :to="'/convocatorias/' + conv.idtipo_conv_comun" @click="$store.commit('clickLink')">
             {{ formatTitle(conv.tipo_conv_comun_titulo) }}
@@ -12,7 +11,7 @@
           </router-link>
         </li>
 
-        <!-- Cursos -->
+
         <li v-for="(cur, id_cur) of MenuCur" :key="cur.idtipo_curso_otros || id_cur">
           <router-link :to="'/cursos/' + cur.idtipo_curso_otros" @click="$store.commit('clickLink')">
             {{ formatTitle(cur.tipo_conv_curso_nombre) }}
@@ -20,7 +19,6 @@
           </router-link>
         </li>
 
-        <!-- Otras categorías -->
         <li>
           <router-link to="/servicios" @click="$store.commit('clickLink')">
              Servicios <span>{{ serviciosCount }}</span>
@@ -57,13 +55,24 @@
     <div class="tags">
       <h3>Tags</h3>
       <ul class="tags-list clearfix left-aligned">
+
         <li v-for="(link, id_link) of linksData" :key="link.id_link || id_link">
-          <a :href="link.ei_link?.trim() || link.url_link?.trim()" 
-             target="_blank" 
-             rel="noopener noreferrer"
-             :title="link.ei_tipo || link.tipo">
+          <a 
+            v-if="getSafeLinkUrl(link)"
+            :href="getSafeLinkUrl(link)" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            :title="link.ei_tipo || link.tipo">
             {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}<br>
           </a>
+
+          <span 
+            v-else
+            :title="link.ei_tipo || link.tipo"
+            style="cursor: not-allowed; opacity: 0.6;"
+          >
+            {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}<br>
+          </span>
         </li>
         <li>
           <a href="https://utic.upea.bo" target="_blank" rel="noopener noreferrer">UTIC UPEA</a>
@@ -74,6 +83,7 @@
 </template>
 
 <style scoped>
+
 .left-aligned { text-align: left; }
 .category ul li { list-style: none; padding: 8px 0; border-bottom: 1px solid #eee; }
 .category ul li a { display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; }
@@ -132,7 +142,6 @@ export default {
       })) || [];
     },
     
-    // ✅ CORREGIDO: Filtrar por campos que SÍ existen
     serviciosCount() {
       return this.servicios?.filter(s => s.serv_active === "1" || s.serv_active === 1)?.length || 0;
     },
@@ -145,23 +154,44 @@ export default {
       return this.publicaciones?.filter(p => p.publicaciones_id)?.length || 0;
     },
     
-    // ✅ CORREGIDO: Las gacetas NO tienen "gaceta_estado"
     gacetaCount() {
       return this.gacetas?.filter(g => g.gaceta_id && g.gaceta_documento)?.length || 0;
     },
     
-    // ✅ CORREGIDO: Los eventos NO tienen "evento_estado"
     eventosCount() {
       return this.eventos?.filter(e => e.evento_id)?.length || 0;
     },
     
-    // ✅ CORREGIDO: Filtrar por video_id (campo que SÍ existe)
     videosCount() {
       return this.videos?.filter(v => v.video_id)?.length || 0;
     },
   },
   
   methods: {
+
+    getSafeLinkUrl(link) {
+      if (!link) return null;
+      const url = link.ei_link?.trim() || link.url_link?.trim();
+      if (!url) return null;
+      
+
+      if (this.$isSafeLink?.(url)) {
+        return url;
+      }
+      
+
+      try {
+        const normalized = url.startsWith('http') ? url : `https://${url}`;
+        const parsed = new URL(normalized);
+        if (parsed.protocol !== 'https:') return null;
+        const allowed = ['upea.bo', 'youtube.com', 'youtu.be', 'facebook.com', 'twitter.com', 'x.com', 'whatsapp.com', 'google.com'];
+        const hostname = parsed.hostname.replace(/^www\./, '');
+        return allowed.some(d => hostname === d || hostname.endsWith(`.${d}`)) ? url : null;
+      } catch {
+        return null;
+      }
+    },
+    
     formatTitle(text) {
       if (!text) return '';
       return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -188,6 +218,5 @@ export default {
       this.$router.go(-1);
     },
   },
-  
 };
 </script>

@@ -1,7 +1,4 @@
 <template>
-  <!-- ==============================================
-    ** Inner Banner **
-    =================================================== -->
   <div class="inner-banner blog">
     <div class="container">
       <div class="row">
@@ -18,9 +15,6 @@
     </div>
   </div>
 
-  <!-- ==============================================
-    ** Blog **
-    =================================================== -->
   <div class="container blog-wrapper padding-lg">
 
     <div v-if="serviciosList.length === 0" class="text-center py-5">
@@ -39,7 +33,7 @@
             <li>
               <img 
                 style="width: 750px; height: 270px; object-fit: cover; border-radius: 8px;" 
-                :src="imageUrl + serv.serv_imagen" 
+                :src="buildSafeImageUrl(serv.serv_imagen)" 
                 class="img-responsive" 
                 :alt="serv.serv_nombre || 'Imagen de servicio'" 
               />
@@ -111,24 +105,18 @@
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
-
 .text-muted {
   color: #6c757d;
 }
-
 .py-5 {
   padding: 3rem 0;
 }
-
 .mt-4 {
   margin-top: 1.5rem;
 }
-
 .mb-4 {
   margin-bottom: 1.5rem;
 }
-
-/* Paginación */
 .pagination.blue {
   display: flex;
   gap: 0.25rem;
@@ -136,7 +124,6 @@
   padding: 0;
   margin: 0;
 }
-
 .pagination.blue li a {
   display: block;
   padding: 8px 14px;
@@ -146,30 +133,23 @@
   text-decoration: none;
   transition: all 0.2s;
 }
-
 .pagination.blue li.active a {
   background: var(--main-color, #c00014);
   color: #fff;
   border-color: var(--main-color, #c00014);
 }
-
 .pagination.blue li.disable a {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .pagination.blue li a:hover:not(.disable) {
   background: var(--main-color, #c00014);
   color: #fff;
 }
-
-/* Imagen responsive */
 img.img-responsive {
   max-width: 100%;
   height: auto;
 }
-
-/* Post detail */
 .post-detail {
   list-style: none;
   padding: 0;
@@ -179,14 +159,12 @@ img.img-responsive {
   flex-wrap: wrap;
   align-items: center;
 }
-
 .post-detail li {
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
 .post-detail .label {
   background: var(--main-color, #c00014);
   color: #fff;
@@ -194,17 +172,13 @@ img.img-responsive {
   border-radius: 4px;
   font-size: 0.85rem;
 }
-
 .post-detail .bold {
   font-weight: 600;
 }
-
-/* Enlace de teléfono */
 .post-detail a {
   color: inherit;
   text-decoration: none;
 }
-
 .post-detail a:hover {
   color: var(--main-color, #c00014);
 }
@@ -232,7 +206,12 @@ export default {
     ...mapState(["servicios", "url_api"]),
 
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
     },
 
     serviciosList() {
@@ -242,6 +221,7 @@ export default {
     pager() {
       return Math.ceil(this.serviciosList.length / this.NUM_RESULTS);
     },
+    
     serviciosPaginados() {
       const start = (this.pag - 1) * this.NUM_RESULTS;
       const end = start + this.NUM_RESULTS;
@@ -250,6 +230,16 @@ export default {
   },
   
   methods: {
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
     formatearFecha(fechaISO) {
       if (!fechaISO) return '';
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -274,7 +264,6 @@ export default {
   },
   
   watch: {
-
     serviciosList: {
       handler() {
         if (this.pag > this.pager) this.pag = 1;
@@ -284,7 +273,6 @@ export default {
   },
   
   created() {
-
     this.$store.commit("loading");
   },
 };

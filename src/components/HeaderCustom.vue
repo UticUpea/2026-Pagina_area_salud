@@ -56,6 +56,7 @@
               <router-link to="/historia" @click="closeAll()" :style="{ color: colors.text }">HISTORIA</router-link>
             </li>
 
+
             <li class="dropdown" :class="{ 'open': activeDropdown === 'convocatorias' }">
               <a href="#" @click.stop.prevent="toggleDropdown('convocatorias')" :style="{ color: colors.text }">
                 CONVOCATORIAS
@@ -166,15 +167,26 @@
                 }"
               >
                 <li v-for="(link, id_link) of linksData" :key="link.id_link || id_link">
-                  <a :href="link.ei_link?.trim() || link.url_link?.trim()" 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     :title="link.ei_tipo || link.tipo"
-                     @click="closeAll()"
-                     :style="{ color: colors.text }"
+
+                  <a 
+                    v-if="getSafeLinkUrl(link)" 
+                    :href="getSafeLinkUrl(link)" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    :title="link.ei_tipo || link.tipo"
+                    @click="closeAll()"
+                    :style="{ color: colors.text }"
                   >
                     {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}
                   </a>
+
+                  <span 
+                    v-else 
+                    :style="{ color: colors.text, opacity: 0.5, cursor: 'not-allowed' }"
+                    :title="link.ei_nombre || link.nombre"
+                  >
+                    {{ (link.ei_nombre || link.nombre)?.toUpperCase() }} (enlace no disponible)
+                  </span>
                 </li>
               </ul>
             </li>
@@ -184,6 +196,252 @@
     </nav>
   </header>
 </template>
+
+<script>
+import { mapState } from "vuex";
+import TopHeaderCustom from "@/components/TopHeaderCustom.vue";
+import api from '@/plugins/axios';
+
+export default {
+  name: "HeaderCustom",
+  
+  data() {
+    return {
+      sopen: false,
+      m_inicio: false,
+      m_conv: false,
+      m_cur: false,
+      m_mas: false,
+      m_link: false,
+      isHome: false,
+      isMenuCollapsed: true,
+      activeDropdown: null,
+      isMobile: false,
+    };
+  },
+  
+  components: {
+    TopHeaderCustom,
+  },
+  
+  computed: {
+    ...mapState(["url_api", "MenuConv", "MenuCur", "Institucion", "getter", "Links"]),
+    
+    institucionData() {
+      return this.Institucion?.Descripcion || this.Institucion;
+    },
+
+    colors() {
+      const colorList = this.Institucion?.colorinstitucion || [];
+      const colors = colorList[0];
+      
+      if (colors) {
+        const primary = colors.color_primario || '#C00014';
+        const secondary = colors.color_secundario || '#FEFEFE';
+        const tertiary = colors.color_terciario || '#F1EDEF';
+        
+        return {
+          primary,
+          secondary,
+          tertiary,
+          text: this.getContrastColor(primary),
+          border: 'rgba(255, 255, 255, 0.3)',
+          mobileBg: `linear-gradient(180deg, ${primary} 0%, ${this.adjustColor(primary, -30)} 100%)`,
+          dropdownBg: primary,
+          hoverBg: 'rgba(255, 255, 255, 0.15)'
+        };
+      }
+      
+      return {
+        primary: '#C00014',
+        secondary: '#FEFEFE',
+        tertiary: '#F1EDEF',
+        text: '#FFFFFF',
+        border: 'rgba(255, 255, 255, 0.3)',
+        mobileBg: 'linear-gradient(180deg, #C00014 0%, #8b000c 100%)',
+        dropdownBg: '#C00014',
+        hoverBg: 'rgba(255, 255, 255, 0.15)'
+      };
+    },
+
+    navbarStyles() {
+      return {
+        background: `linear-gradient(135deg, ${this.colors.primary} 0%, ${this.adjustColor(this.colors.primary, -20)} 100%)`,
+        boxShadow: `0 2px 10px ${this.colors.primary}40`
+      };
+    },
+
+    dropdownStyles() {
+      return {
+        background: `linear-gradient(135deg, ${this.colors.dropdownBg} 0%, ${this.adjustColor(this.colors.dropdownBg, -20)} 100%)`,
+        border: `2px solid ${this.colors.primary}`
+      };
+    },
+
+    linksData() {
+      return this.Links?.map(link => ({
+        id_link: link.id_link || link.id || link.ei_id,
+        ei_link: link.ei_link || link.url_link,
+        ei_nombre: link.ei_nombre || link.nombre,
+        ei_tipo: link.ei_tipo || link.tipo,
+        ei_estado: link.ei_estado ?? link.estado,
+      })) || [];
+    },
+  },
+  
+  methods: {
+
+    getSafeLinkUrl(link) {
+      if (!link) return null;
+      const url = link.ei_link?.trim() || link.url_link?.trim();
+      if (!url) return null;
+      
+ 
+      if (this.$isSafeLink?.(url)) {
+        return url;
+      }
+
+      try {
+        const normalized = url.startsWith('http') ? url : `https://${url}`;
+        const parsed = new URL(normalized);
+        if (parsed.protocol !== 'https:') return null;
+        const allowed = ['upea.bo', 'youtube.com', 'youtu.be', 'facebook.com', 'twitter.com', 'x.com', 'whatsapp.com', 'google.com'];
+        const hostname = parsed.hostname.replace(/^www\./, '');
+        if (allowed.some(d => hostname === d || hostname.endsWith(`.${d}`))) {
+          return url;
+        }
+      } catch {
+        return null;
+      }
+      return null;
+    },
+    
+    getContrastColor(hexColor) {
+      if (!hexColor) return '#FFFFFF';
+      const color = hexColor.replace('#', '');
+      if (color.length !== 6) return '#FFFFFF';
+      const r = parseInt(color.substr(0, 2), 16);
+      const g = parseInt(color.substr(2, 2), 16);
+      const b = parseInt(color.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5 ? '#000000' : '#FFFFFF';
+    },
+
+    adjustColor(color, amount) {
+      if (!color) return color;
+      const clean = color.replace('#', '');
+      if (clean.length !== 6) return color;
+      return '#' + clean.replace(/../g, hex => 
+        ('0' + Math.min(255, Math.max(0, parseInt(hex, 16) + amount)).toString(16)).substr(-2)
+      );
+    },
+    
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 991;
+    },
+    
+    toggleMenu() {
+      this.isMenuCollapsed = !this.isMenuCollapsed;
+      if (this.isMobile) {
+        this.activeDropdown = null;
+      }
+    },
+    
+    toggleDropdown(dropdownName) {
+      if (this.activeDropdown === dropdownName) {
+        this.activeDropdown = null;
+      } else {
+        this.activeDropdown = dropdownName;
+      }
+    },
+    
+    closeAll() {
+      this.activeDropdown = null;
+      this.$store.commit("clickLink");
+      if (this.isMobile) {
+        setTimeout(() => {
+          this.isMenuCollapsed = true;
+        }, 150);
+      }
+    },
+    
+    handleClickOutside(event) {
+      if (!this.$refs.navbar?.contains(event.target)) {
+        if (!this.isMenuCollapsed) {
+          this.isMenuCollapsed = true;
+        }
+        this.activeDropdown = null;
+      }
+    },
+    
+    async getLinks() {
+      try {
+        const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
+        if (!idInstitucion) {
+          console.error('❌ VUE_APP_ID_INSTITUCION no definida');
+          return;
+        }
+        const res = await api.get(`/institucion/${idInstitucion}/recursos`);
+        const links = res.data.linksExternoInterno || res.data.LinksExternoInterno || [];
+        const filterLinks = links
+          .filter(link => link.estado === 1 || link.ei_estado === "1")
+          .map(link => ({
+            ...link,
+            ei_link: link.ei_link || link.url_link,
+            ei_nombre: link.ei_nombre || link.nombre,
+            ei_tipo: link.ei_tipo || link.tipo,
+          }));
+        this.$store.commit('setLinks', filterLinks);
+      } catch (error) {
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        console.error(isProd ? '❌ Error cargando enlaces' : 'Error cargando Links:', isProd ? '' : error);
+        try {
+          const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
+          if (!idInstitucion) return;
+          const res = await api.get(`/linksIntExtAll/${idInstitucion}`);
+          const filterLinks = res.data.filter(link => link.ei_estado == "1");
+          this.$store.commit('setLinks', filterLinks);
+        } catch (err) {
+          if (!isProd) console.error('Fallback failed');
+        }
+      }
+    },
+  },
+  
+  created() {
+    this.isHome = this.$route.path === "/";
+    if (!this.Links?.length) {
+      this.getLinks();
+    }
+  },
+  
+  mounted() {
+    if (this.getter) {
+      this.getLinks();
+      this.$store.commit('setGetter', false);
+    }
+    
+    this.checkMobile();
+    window.addEventListener('resize', this.checkMobile);
+    document.addEventListener('click', this.handleClickOutside);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('resize', this.checkMobile);
+    document.removeEventListener('click', this.handleClickOutside);
+  },
+
+  watch: {
+    $route(to) {
+      this.isHome = to.path === "/";
+      if (this.isMobile) {
+        this.isMenuCollapsed = true;
+        this.activeDropdown = null;
+      }
+    },
+  },
+};
+</script>
 
 <style scoped>
 
@@ -504,220 +762,3 @@
   }
 }
 </style>
-
-<script>
-import { mapState } from "vuex";
-import TopHeaderCustom from "@/components/TopHeaderCustom.vue";
-import api from '@/plugins/axios';
-
-export default {
-  name: "HeaderCustom",
-  
-  data() {
-    return {
-      sopen: false,
-      m_inicio: false,
-      m_conv: false,
-      m_cur: false,
-      m_mas: false,
-      m_link: false,
-      isHome: false,
-      isMenuCollapsed: true,
-      activeDropdown: null,
-      isMobile: false,
-    };
-  },
-  
-  components: {
-    TopHeaderCustom,
-  },
-  
-  computed: {
-    ...mapState(["url_api", "MenuConv", "MenuCur", "Institucion", "getter", "Links"]),
-    
-    institucionData() {
-      return this.Institucion?.Descripcion || this.Institucion;
-    },
-
-    colors() {
-      const colorList = this.Institucion?.colorinstitucion || [];
-      const colors = colorList[0];
-      
-      if (colors) {
-        const primary = colors.color_primario || '#C00014';
-        const secondary = colors.color_secundario || '#FEFEFE';
-        const tertiary = colors.color_terciario || '#F1EDEF';
-        
-        return {
-          primary,
-          secondary,
-          tertiary,
-          text: this.getContrastColor(primary),
-          border: 'rgba(255, 255, 255, 0.3)',
-          mobileBg: `linear-gradient(180deg, ${primary} 0%, ${this.adjustColor(primary, -30)} 100%)`,
-          dropdownBg: primary,
-          hoverBg: 'rgba(255, 255, 255, 0.15)'
-        };
-      }
-      
-      return {
-        primary: '#C00014',
-        secondary: '#FEFEFE',
-        tertiary: '#F1EDEF',
-        text: '#FFFFFF',
-        border: 'rgba(255, 255, 255, 0.3)',
-        mobileBg: 'linear-gradient(180deg, #C00014 0%, #8b000c 100%)',
-        dropdownBg: '#C00014',
-        hoverBg: 'rgba(255, 255, 255, 0.15)'
-      };
-    },
-
-    navbarStyles() {
-      return {
-        background: `linear-gradient(135deg, ${this.colors.primary} 0%, ${this.adjustColor(this.colors.primary, -20)} 100%)`,
-        boxShadow: `0 2px 10px ${this.colors.primary}40`
-      };
-    },
-
-    dropdownStyles() {
-      return {
-        background: `linear-gradient(135deg, ${this.colors.dropdownBg} 0%, ${this.adjustColor(this.colors.dropdownBg, -20)} 100%)`,
-        border: `2px solid ${this.colors.primary}`
-      };
-    },
-
-    linksData() {
-      return this.Links?.map(link => ({
-        id_link: link.id_link || link.id || link.ei_id,
-        ei_link: link.ei_link || link.url_link,
-        ei_nombre: link.ei_nombre || link.nombre,
-        ei_tipo: link.ei_tipo || link.tipo,
-        ei_estado: link.ei_estado ?? link.estado,
-      })) || [];
-    },
-  },
-  
-  methods: {
-    getContrastColor(hexColor) {
-      if (!hexColor) return '#FFFFFF';
-      const color = hexColor.replace('#', '');
-      if (color.length !== 6) return '#FFFFFF';
-      const r = parseInt(color.substr(0, 2), 16);
-      const g = parseInt(color.substr(2, 2), 16);
-      const b = parseInt(color.substr(4, 2), 16);
-      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      return luminance > 0.5 ? '#000000' : '#FFFFFF';
-    },
-
-    adjustColor(color, amount) {
-      if (!color) return color;
-      const clean = color.replace('#', '');
-      if (clean.length !== 6) return color;
-      return '#' + clean.replace(/../g, hex => 
-        ('0' + Math.min(255, Math.max(0, parseInt(hex, 16) + amount)).toString(16)).substr(-2)
-      );
-    },
-    
-    checkMobile() {
-      this.isMobile = window.innerWidth <= 991;
-    },
-    
-    toggleMenu() {
-      this.isMenuCollapsed = !this.isMenuCollapsed;
-      if (this.isMobile) {
-        this.activeDropdown = null;
-      }
-    },
-    
-    toggleDropdown(dropdownName) {
-      if (this.activeDropdown === dropdownName) {
-        this.activeDropdown = null;
-      } else {
-        this.activeDropdown = dropdownName;
-      }
-    },
-    
-    closeAll() {
-      this.activeDropdown = null;
-      this.$store.commit("clickLink");
-      if (this.isMobile) {
-        setTimeout(() => {
-          this.isMenuCollapsed = true;
-        }, 150);
-      }
-    },
-    
-    handleClickOutside(event) {
-      if (!this.$refs.navbar?.contains(event.target)) {
-        if (!this.isMenuCollapsed) {
-          this.isMenuCollapsed = true;
-        }
-        this.activeDropdown = null;
-      }
-    },
-    
-    async getLinks() {
-      try {
-        const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
-        const res = await api.get(`/institucion/${idInstitucion}/recursos`);
-        const links = res.data.linksExternoInterno || res.data.LinksExternoInterno || [];
-        const filterLinks = links
-          .filter(link => link.estado === 1 || link.ei_estado === "1")
-          .map(link => ({
-            ...link,
-            ei_link: link.ei_link || link.url_link,
-            ei_nombre: link.ei_nombre || link.nombre,
-            ei_tipo: link.ei_tipo || link.tipo,
-          }));
-        this.$store.commit('setLinks', filterLinks);
-      } catch (error) {
-        console.error('Error cargando Links:', error);
-        try {
-          const res = await api.get(`/linksIntExtAll/${process.env.VUE_APP_ID_INSTITUCION}`);
-          const filterLinks = res.data.filter(link => link.ei_estado == "1");
-          this.$store.commit('setLinks', filterLinks);
-        } catch (err) {
-          console.error('Fallback failed:', err);
-        }
-      }
-    },
-  },
-  
-  created() {
-    this.isHome = this.$route.path === "/";
-    if (!this.Links?.length) {
-      this.getLinks();
-    }
-  },
-  
-  mounted() {
-    if (this.getter) {
-      this.getLinks();
-      this.$store.commit('setGetter', false);
-    }
-    
-    this.checkMobile();
-    window.addEventListener('resize', this.checkMobile);
-    document.addEventListener('click', this.handleClickOutside);
-    
-    // if (process.env.NODE_ENV === 'development') {
-    //   console.log('🎨 Header - Colores:', this.colors);
-    // }
-  },
-
-  beforeUnmount() {
-    window.removeEventListener('resize', this.checkMobile);
-    document.removeEventListener('click', this.handleClickOutside);
-  },
-
-  watch: {
-    $route(to) {
-      this.isHome = to.path === "/";
-      if (this.isMobile) {
-        this.isMenuCollapsed = true;
-        this.activeDropdown = null;
-      }
-    },
-  },
-};
-</script>

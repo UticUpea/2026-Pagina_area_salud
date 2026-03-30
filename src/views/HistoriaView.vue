@@ -23,20 +23,21 @@
   <div class="container blog-wrapper padding-lg">
     <div class="row">
       <div class="col-sm-8 blog-left">
+        <!-- ✅ Sanitizar HTML antes de renderizar (protección XSS) -->
         <p class="content left-aligned" 
-           v-html="institucionData?.institucion_historia || '<p class=\'text-center\'>Cargando historia...</p>'">
+           v-html="$sanitize(institucionData?.institucion_historia) || '<p class=\'text-center\'>Cargando historia...</p>'">
         </p>
       </div>
 
       <div class="col-sm-4">
         <SidebarCustom />
       </div>
-
     </div>
   </div>
 </template>
 
 <style scoped>
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .text-wrap {
   text-align: justify;
   padding: 0 70px;
@@ -85,6 +86,7 @@ export default {
   
   computed: {
     ...mapState(["Institucion"]),
+    
     institucionData() {
       const data = this.Institucion?.Descripcion || this.Institucion;
       if (!data || Object.keys(data).length === 0) {

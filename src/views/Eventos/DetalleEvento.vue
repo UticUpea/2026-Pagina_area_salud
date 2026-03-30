@@ -46,8 +46,9 @@
               class="image-zoom-container"
               @click="openImageModal"
             >
+              <!-- ✅ Imagen con URL segura -->
               <img
-                :src="imageUrl + eventoData.evento_imagen"
+                :src="buildSafeImageUrl(eventoData.evento_imagen)"
                 :alt="eventoData.evento_titulo || 'Imagen del evento'"
                 class="img-responsive preview-image"
               />
@@ -83,7 +84,8 @@
             </ul>
             
             <p class="left-aligned">Descripción del evento:</p>
-            <p class="left-aligned" v-html="eventoData.evento_descripcion"></p>
+            <!-- ✅ Sanitizar HTML antes de renderizar (protección XSS) -->
+            <p class="left-aligned" v-html="$sanitize(eventoData.evento_descripcion)"></p>
             
             <div class="mt-4">
               <button @click="clickBack()" class="btn btn-outline">
@@ -120,8 +122,9 @@
       <button class="modal-close-btn" @click="closeImageModal">
         <i class="fa fa-times"></i>
       </button>
+      <!-- ✅ Imagen modal con URL segura -->
       <img 
-        :src="imageUrl + eventoData.evento_imagen" 
+        :src="buildSafeImageUrl(eventoData.evento_imagen)" 
         :alt="eventoData.evento_titulo"
         class="modal-image"
       />
@@ -130,7 +133,7 @@
 </template>
 
 <style scoped>
-
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .blog-listing,
 .blog-listing li,
 .blog-left,
@@ -141,7 +144,6 @@
   max-height: none !important;
   height: auto !important;
 }
-
 .image-zoom-container {
   position: relative;
   display: block;
@@ -150,7 +152,6 @@
   cursor: zoom-in;
   overflow: visible !important; 
 }
-
 .preview-image {
   width: 100%;
   height: auto !important;       
@@ -160,11 +161,9 @@
   border-radius: 8px;
   display: block;
 }
-
 .image-zoom-container:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
-
 .zoom-overlay {
   position: absolute;
   bottom: 15px;
@@ -182,21 +181,11 @@
   transition: opacity 0.2s;
   pointer-events: none;
 }
-
-.image-zoom-container:hover .zoom-overlay {
-  opacity: 1;
-}
-
-.zoom-overlay .fa-search-plus {
-  font-size: 1rem;
-}
-
+.image-zoom-container:hover .zoom-overlay { opacity: 1; }
+.zoom-overlay .fa-search-plus { font-size: 1rem; }
 .image-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   align-items: center;
@@ -206,14 +195,12 @@
   overflow-y: auto;
   padding: 40px 20px;
 }
-
 .image-modal-content {
   position: relative;
   width: 100%;
   max-width: 500px;
   animation: zoomIn 0.3s ease;
 }
-
 .modal-image {
   width: 100%;
   height: auto;
@@ -223,16 +210,13 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   display: block;
 }
-
 .modal-close-btn {
   position: fixed;
-  top: 30px;
-  right: 30px;
+  top: 30px; right: 30px;
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: #fff;
-  width: 50px;
-  height: 50px;
+  width: 50px; height: 50px;
   border-radius: 50%;
   cursor: pointer;
   font-size: 2rem;
@@ -242,32 +226,17 @@
   transition: all 0.2s;
   z-index: 10000;
 }
-
 .modal-close-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.1);
 }
-
-.bg-overlay-img {
-  background-image: url("@/assets/Fondo2.jpg");
-}
-
-.text-muted {
-  color: #6c757d;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-5 {
-  padding: 3rem 0;
-}
-
+.bg-overlay-img { background-image: url("@/assets/Fondo2.jpg"); }
+.text-muted { color: #6c757d; }
+.text-center { text-align: center; }
+.py-5 { padding: 3rem 0; }
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
 .mb-0 { margin-bottom: 0; }
-
 .btn {
   display: inline-block;
   padding: 8px 20px;
@@ -278,18 +247,15 @@
   text-decoration: none;
   border: none;
 }
-
 .btn-outline {
   background: transparent;
   border: 1px solid var(--main-color, #c00014);
   color: var(--main-color, #c00014);
 }
-
 .btn-outline:hover {
   background: var(--main-color, #c00014);
   color: #fff;
 }
-
 .post-detail {
   list-style: none;
   padding: 0;
@@ -299,14 +265,12 @@
   flex-wrap: wrap;
   align-items: center;
 }
-
 .post-detail li {
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
 .post-detail .label {
   background: var(--main-color, #c00014);
   color: #fff;
@@ -314,66 +278,30 @@
   border-radius: 4px;
   font-size: 0.85rem;
 }
-
-.post-detail .label a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.post-detail .bold {
-  font-weight: 600;
-}
-
-img.img-responsive {
-  max-width: 100%;
-  height: auto;
-}
-
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-  border-width: 0.25em;
-}
-
+.post-detail .label a { color: inherit; text-decoration: none; }
+.post-detail .bold { font-weight: 600; }
+img.img-responsive { max-width: 100%; height: auto; }
+.spinner-border { width: 3rem; height: 3rem; border-width: 0.25em; }
 .visually-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
+  width: 1px; height: 1px;
+  padding: 0; overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
 }
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes zoomIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
-}
-
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 @media (max-width: 768px) {
   .modal-close-btn {
-    top: 15px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
+    top: 15px; right: 15px;
+    width: 40px; height: 40px;
     font-size: 1.5rem;
   }
-  
-  .image-modal-overlay {
-    padding: 20px 10px;
-  }
+  .image-modal-overlay { padding: 20px 10px; }
 }
-
 @media (max-height: 600px) {
-  .image-modal-overlay {
-    padding: 60px 10px 20px;
-  }
+  .image-modal-overlay { padding: 60px 10px 20px; }
 }
 </style>
 
@@ -397,8 +325,14 @@ export default {
   computed: {
     ...mapState(["eventos", "url_api"]),
 
+    // ✅ imageUrl: sin fallback en producción
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/uploads').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
     },
     
     eventoData() {
@@ -421,6 +355,19 @@ export default {
   },
   
   methods: {
+    // ✅ Construir URL de imagen segura (fuerza HTTPS)
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      // Si ya es URL absoluta, forzar HTTPS
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      // Si es ruta relativa, unir con base URL
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
     openImageModal() {
       this.showImageModal = true;
       document.body.style.overflow = 'hidden';

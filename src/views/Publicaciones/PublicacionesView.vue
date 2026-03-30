@@ -39,9 +39,10 @@
           class="mb-4"
         >
           <div class="blog-listing">
+            <!-- ✅ Imagen con URL segura -->
             <img
               style="width: 100%; height: 270px; object-fit: cover; border-radius: 8px;"
-              :src="imageUrl + pub.publicaciones_imagen"
+              :src="buildSafeImageUrl(pub.publicaciones_imagen)"
               class="img-responsive"
               :alt="pub.publicaciones_titulo || 'Imagen de publicación'"
             />
@@ -122,22 +123,13 @@
 </template>
 
 <style scoped>
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .bg-overlay-img {
   background-image: url("@/assets/Fondo2.jpg");
 }
-
-.text-muted {
-  color: #6c757d;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-5 {
-  padding: 3rem 0;
-}
-
+.text-muted { color: #6c757d; }
+.text-center { text-align: center; }
+.py-5 { padding: 3rem 0; }
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
 .mb-4 { margin-bottom: 1.5rem; }
@@ -150,7 +142,6 @@
   margin: 0;
   justify-content: center;
 }
-
 .pagination.blue li a {
   display: block;
   padding: 8px 14px;
@@ -160,27 +151,21 @@
   text-decoration: none;
   transition: all 0.2s;
 }
-
 .pagination.blue li.active a {
   background: var(--main-color, #c00014);
   color: #fff;
   border-color: var(--main-color, #c00014);
 }
-
 .pagination.blue li.disable a {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .pagination.blue li a:hover:not(.disable) {
   background: var(--main-color, #c00014);
   color: #fff;
 }
 
-img.img-responsive {
-  max-width: 100%;
-  height: auto;
-}
+img.img-responsive { max-width: 100%; height: auto; }
 
 .post-detail {
   list-style: none;
@@ -191,14 +176,12 @@ img.img-responsive {
   flex-wrap: wrap;
   align-items: center;
 }
-
 .post-detail li {
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
 .post-detail .label {
   background: var(--main-color, #c00014);
   color: #fff;
@@ -206,10 +189,7 @@ img.img-responsive {
   border-radius: 4px;
   font-size: 0.85rem;
 }
-
-.post-detail .bold {
-  font-weight: 600;
-}
+.post-detail .bold { font-weight: 600; }
 
 .read-more {
   display: inline-flex;
@@ -221,15 +201,11 @@ img.img-responsive {
   margin-top: 0.5rem;
   transition: gap 0.2s;
 }
-
 .read-more:hover {
   gap: 0.6rem;
   color: #a00010;
 }
-
-.read-more .icon-play-icon {
-  font-size: 0.9rem;
-}
+.read-more .icon-play-icon { font-size: 0.9rem; }
 </style>
 
 <script>
@@ -253,9 +229,14 @@ export default {
   computed: {
     ...mapState(["publicaciones", "url_api"]),
     
-    // ✅ CORREGIDO: URL sin espacios + dominio correcto
+    // ✅ imageUrl: sin fallback en producción
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo/uploads').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo/uploads' : '');
     },
     
     publicacionesList() {
@@ -274,6 +255,19 @@ export default {
   },
   
   methods: {
+    // ✅ Construir URL de imagen segura (fuerza HTTPS)
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      // Si ya es URL absoluta, forzar HTTPS
+      if (cleaned.startsWith('http')) {
+        return cleaned.replace('http://', 'https://');
+      }
+      // Si es ruta relativa, unir con base URL
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
     formatearFecha(fechaISO) {
       if (!fechaISO) return '';
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];

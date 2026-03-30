@@ -29,7 +29,9 @@
           class="col-xs-6 col-sm-6 grid-item"
         >
           <li>
+            <!-- ✅ Iframe con URL validada y atributos de seguridad -->
             <iframe
+              v-if="isSafeVideoUrl(vid.video_enlace)"
               :src="vid.video_enlace?.trim()"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -37,7 +39,13 @@
               loading="lazy"
               style="border-radius: 5px; width: 100%; min-height: 250px;"
               :title="vid.video_titulo"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+              referrerpolicy="strict-origin-when-cross-origin"
             />
+            <!-- ✅ Fallback si la URL no es segura -->
+            <div v-else class="text-center py-3 text-muted">
+              <i class="fa fa-video-slash"></i> Video no disponible
+            </div>
             <br />
 
             <ul class="post-detail">
@@ -55,7 +63,8 @@
               {{ vid.video_titulo }}
             </h5>
 
-            <p v-if="vid.video_breve_descripcion" class="video-desc text-muted small" v-html="vid.video_breve_descripcion"></p>
+            <!-- ✅ Sanitizar HTML antes de renderizar (protección XSS) -->
+            <p v-if="vid.video_breve_descripcion" class="video-desc text-muted small" v-html="$sanitize(vid.video_breve_descripcion)"></p>
           </li>
         </ul>
 
@@ -118,6 +127,20 @@ export default {
   },
   
   methods: {
+    isSafeVideoUrl(url) {
+      if (!url || typeof url !== 'string') return false;
+      try {
+        const normalized = url.startsWith('http') ? url : `https://${url}`;
+        const parsed = new URL(normalized);
+        if (parsed.protocol !== 'https:') return false;
+        const allowed = ['youtube.com', 'youtu.be', 'vimeo.com', 'drive.google.com'];
+        const hostname = parsed.hostname.replace(/^www\./, '');
+        return allowed.some(d => hostname === d || hostname.endsWith(`.${d}`));
+      } catch {
+        return false;
+      }
+    },
+    
     formatearFecha(fechaISO) {
       if (!fechaISO) return '';
       const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -159,13 +182,18 @@ export default {
     async recargarVideos() {
       try {
         const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
+        if (!idInstitucion && process.env.VUE_APP_ENV === 'production') {
+          console.error('❌ VUE_APP_ID_INSTITUCION no definida en producción');
+          return;
+        }
         const { data } = await this.$api?.get(`/institucion/${idInstitucion}/contenido`) 
           || await import('@/plugins/axios').then(m => m.default.get(`/institucion/${idInstitucion}/contenido`));
         
         const videosNuevos = data.upea_videos?.filter(v => v.video_estado === 1) || [];
         this.$store?.commit?.('setVideos', videosNuevos);
       } catch (error) {
-        console.error('Error recargando videos:', error);
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        if (!isProd) console.error('Error recargando videos:', error);
       }
     },
   },
@@ -176,7 +204,6 @@ export default {
   },
   
   created() {
-
     this.$store.commit("loading");
     this.updatePager();
   },

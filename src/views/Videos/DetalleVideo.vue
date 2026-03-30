@@ -38,10 +38,12 @@
             </div>
           </div>
 
-          <div class="col-lg-8 col-12" v-else>
+          <div class="col-lg-8 col-12" v-else-if="videoData">
             <div class="single-blog-inner mb-0">
               <div class="thumb">
+                <!-- ✅ Iframe con URL validada y atributos de seguridad -->
                 <iframe
+                  v-if="isSafeVideoUrl(videoData.video_enlace)"
                   :src="videoData.video_enlace?.trim()"
                   style="width: 100%; aspect-ratio: 16/9; border-radius: 10px;"
                   frameborder="0"
@@ -49,7 +51,13 @@
                   allowfullscreen="allowfullscreen"
                   loading="lazy"
                   :title="videoData.video_titulo"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+                  referrerpolicy="strict-origin-when-cross-origin"
                 />
+                <!-- ✅ Fallback si la URL no es segura -->
+                <div v-else class="text-center py-3 text-muted">
+                  <i class="fa fa-video-slash"></i> Video no disponible
+                </div>
               </div>
               <div class="details">
                 <div class="blog-meta border-0 mt-0 pt-0">
@@ -67,8 +75,9 @@
             </div>
             
             <div class="blog-content-inner">
+              <!-- ✅ Sanitizar HTML antes de renderizar (protección XSS) -->
               <p v-if="videoData.video_breve_descripcion" 
-                 v-html="videoData.video_breve_descripcion"></p>
+                 v-html="$sanitize(videoData.video_breve_descripcion)"></p>
               <p v-else class="text-muted">
                 Sin descripción disponible.
               </p>
@@ -106,6 +115,7 @@ export default {
   
   computed: {
     ...mapState(["videos", "url_api"]),
+    
     videoData() {
       const videoId = parseInt(this.$route.params.idVid);
       
@@ -127,6 +137,20 @@ export default {
   },
   
   methods: {
+    // ✅ Validar que la URL del video sea de un dominio permitido
+    isSafeVideoUrl(url) {
+      if (!url || typeof url !== 'string') return false;
+      try {
+        const normalized = url.startsWith('http') ? url : `https://${url}`;
+        const parsed = new URL(normalized);
+        if (parsed.protocol !== 'https:') return false;
+        const allowed = ['youtube.com', 'youtu.be', 'vimeo.com', 'drive.google.com'];
+        const hostname = parsed.hostname.replace(/^www\./, '');
+        return allowed.some(d => hostname === d || hostname.endsWith(`.${d}`));
+      } catch {
+        return false;
+      }
+    },
 
     formatearFecha(fechaISO) {
       if (!fechaISO) return '';

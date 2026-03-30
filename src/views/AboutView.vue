@@ -21,7 +21,10 @@
     <div class="row">
       <!-- Start Left Column -->
       <div class="col-sm-8 blog-left">
-        <p class="content left-aligned" v-html="institucionData?.institucion_sobre_ins || 'Cargando...'"></p>
+        <!-- ✅ Sanitizar HTML -->
+        <p class="content left-aligned" 
+           v-html="$sanitize(institucionData?.institucion_sobre_ins) || 'Cargando...'">
+        </p>
       </div>
       <div class="col-sm-4">
         <SidebarCustom />
@@ -37,11 +40,17 @@
       <ul class="row">
         <div class="col-sm-6">
           <h3>Visión</h3>
-          <p class="left-aligned" v-html="institucionData?.institucion_vision || 'Cargando...'"></p>
+          <!-- ✅ Sanitizar HTML -->
+          <p class="left-aligned" 
+             v-html="$sanitize(institucionData?.institucion_vision) || 'Cargando...'">
+          </p>
         </div>
         <div class="col-sm-6">
           <h3>Misión</h3>
-          <p class="left-aligned" v-html="institucionData?.institucion_mision || 'Cargando...'"></p>
+          <!-- ✅ Sanitizar HTML -->
+          <p class="left-aligned" 
+             v-html="$sanitize(institucionData?.institucion_mision) || 'Cargando...'">
+          </p>
         </div>
       </ul>
     </div>
@@ -64,16 +73,19 @@
             v-show="(pag - 1) * NUM_RESULTS <= id_aut && pag * NUM_RESULTS > id_aut">
           
           <figure>
-            <img :src="imageUrl + autoridad.foto_autoridad" 
-                 width="123" height="124" 
-                 alt="Foto de {{ autoridad.nombre_autoridad }}">
+            <!-- ✅ Validar URL de imagen -->
+            <img :src="buildSafeImageUrl(autoridad.foto_autoridad)" 
+                 width="123" 
+                 height="124" 
+                 :alt="'Foto de ' + autoridad.nombre_autoridad">
           </figure>
           
           <h3>{{ autoridad.nombre_autoridad }}</h3>
           <span class="designation">{{ autoridad.cargo_autoridad }}</span>
           
           <ul class="teachers-follow">
-            <li v-if="autoridad.facebook_autoridad?.trim()">
+            <!-- ✅ Validar enlaces externos con $isSafeLink -->
+            <li v-if="autoridad.facebook_autoridad?.trim() && $isSafeLink(autoridad.facebook_autoridad)">
               <a :href="autoridad.facebook_autoridad.trim()" 
                  target="_blank" 
                  rel="noopener noreferrer">
@@ -81,7 +93,7 @@
               </a>
             </li>
 
-            <li v-if="autoridad.twiter_autoridad?.trim()">
+            <li v-if="autoridad.twiter_autoridad?.trim() && $isSafeLink(autoridad.twiter_autoridad)">
               <a :href="autoridad.twiter_autoridad.trim()" 
                  target="_blank" 
                  rel="noopener noreferrer">
@@ -90,7 +102,8 @@
             </li>
 
             <li v-if="autoridad.celular_autoridad">
-              <a :href="'https://wa.me/+591' + String(autoridad.celular_autoridad).replace(/[^0-9]/g, '')" 
+              <!-- ✅ Construir WhatsApp URL segura -->
+              <a :href="buildWhatsAppUrl(autoridad.celular_autoridad)" 
                  target="_blank" 
                  rel="noopener noreferrer">
                 <i class="fa fa-whatsapp" aria-hidden="true"></i>
@@ -151,12 +164,37 @@ export default {
         : this.institucionData?.autoridad || [];
     },
 
+    // ✅ imageUrl: sin fallback en producción
     imageUrl() {
-      return (process.env.VUE_APP_UPLOADS_URL || 'https://apiadministrador.upea.bo').trim();
+      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+      if (process.env.VUE_APP_ENV === 'production' && !url) {
+        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
+        return '';
+      }
+      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
     },
   },
   
   methods: {
+    // ✅ Construir URL de imagen segura
+    buildSafeImageUrl(path) {
+      if (!path) return '';
+      const cleaned = String(path).trim();
+      if (cleaned.startsWith('http')) {
+        // Forzar HTTPS
+        return cleaned.replace('http://', 'https://');
+      }
+      const base = this.imageUrl?.replace(/\/$/, '');
+      return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
+    },
+    
+    // ✅ Construir WhatsApp URL segura
+    buildWhatsAppUrl(celular) {
+      if (!celular) return '#';
+      const cleaned = String(celular).replace(/[^0-9]/g, '');
+      return `https://wa.me/+591${cleaned}`;
+    },
+    
     updatePager() {
       const total = this.autoridadesList?.length || 0;
       this.pager = Math.ceil(total / this.NUM_RESULTS);
@@ -187,7 +225,6 @@ export default {
   },
   
   created() {
-
     this.$store.commit("loading");
     this.updatePager();
   },
@@ -195,6 +232,7 @@ export default {
 </script>
 
 <style scoped>
+/* ✅ Tus estilos originales se mantienen 100% intactos */
 .centered-text {
   text-align: center;
   padding: 0 65px;
