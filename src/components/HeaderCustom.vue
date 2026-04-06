@@ -28,7 +28,6 @@
           :style="{ background: colors.mobileBg }"
         >
           <ul class="nav navbar-nav navbar-center">
-            <!-- INICIO -->
             <li class="dropdown" :class="{ 'open': activeDropdown === 'inicio' }">
               <router-link 
                 to="/" 
@@ -55,7 +54,6 @@
             <li v-if="institucionData?.institucion_historia">
               <router-link to="/historia" @click="closeAll()" :style="{ color: colors.text }">HISTORIA</router-link>
             </li>
-
 
             <li class="dropdown" :class="{ 'open': activeDropdown === 'convocatorias' }">
               <a href="#" @click.stop.prevent="toggleDropdown('convocatorias')" :style="{ color: colors.text }">
@@ -84,7 +82,6 @@
               </ul>
             </li>
 
-            <!-- CURSOS -->
             <li class="dropdown" :class="{ 'open': activeDropdown === 'cursos' }">
               <a href="#" @click.stop.prevent="toggleDropdown('cursos')" :style="{ color: colors.text }">
                 CURSOS <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -167,7 +164,6 @@
                 }"
               >
                 <li v-for="(link, id_link) of linksData" :key="link.id_link || id_link">
-
                   <a 
                     v-if="getSafeLinkUrl(link)" 
                     :href="getSafeLinkUrl(link)" 
@@ -179,7 +175,6 @@
                   >
                     {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}
                   </a>
-
                   <span 
                     v-else 
                     :style="{ color: colors.text, opacity: 0.5, cursor: 'not-allowed' }"
@@ -290,13 +285,11 @@ export default {
   },
   
   methods: {
-
     getSafeLinkUrl(link) {
       if (!link) return null;
       const url = link.ei_link?.trim() || link.url_link?.trim();
       if (!url) return null;
       
- 
       if (this.$isSafeLink?.(url)) {
         return url;
       }
@@ -377,8 +370,7 @@ export default {
     async getLinks() {
       try {
         const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
-        if (!idInstitucion) {
-          console.error('❌ VUE_APP_ID_INSTITUCION no definida');
+        if (!idInstitucion && process.env.VUE_APP_ENV === 'production') {
           return;
         }
         const res = await api.get(`/institucion/${idInstitucion}/recursos`);
@@ -394,7 +386,9 @@ export default {
         this.$store.commit('setLinks', filterLinks);
       } catch (error) {
         const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error cargando enlaces' : 'Error cargando Links:', isProd ? '' : error);
+        if (!isProd) {
+          console.error('Error cargando Links:', error);
+        }
         try {
           const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
           if (!idInstitucion) return;
@@ -444,7 +438,6 @@ export default {
 </script>
 
 <style scoped>
-
 .dropdown-menu {
   display: none;
   border: none !important;
@@ -620,7 +613,6 @@ export default {
 }
 
 @media (max-width: 991px) {
-
   .navbar-collapse.collapse {
     display: none !important;
   }

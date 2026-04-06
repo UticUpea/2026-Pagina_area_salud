@@ -20,9 +20,6 @@
     </div>
   </div>
 
-  <!-- ==============================================
-    ** Course Description **
-    =================================================== -->
   <section class="about inner padding-lg" v-if="cursoData">
     <div class="container">
       <div class="row">
@@ -50,7 +47,7 @@
                 class="image-zoom-container"
                 @click="openImageModal"
               >
-                <!-- ✅ Imagen con URL segura -->
+
                 <img 
                   :src="buildSafeImageUrl(cursoData.det_img_portada)" 
                   :alt="cursoData.det_titulo || 'Imagen del curso'"
@@ -68,9 +65,6 @@
     </div>
   </section>
 
-  <!-- ==============================================
-    ** Course Details Tab **
-    =================================================== -->
   <section class="details-tab" v-if="cursoData">
     <div class="container">
       <div class="row">
@@ -131,7 +125,7 @@
                     <ul class="content">
                       <li>
                         <h4>{{ cursoData.det_titulo }}</h4>
-                        <!-- ✅ Sanitizar HTML antes de renderizar (protección XSS) -->
+
                         <p v-html="$sanitize(cursoData.det_descripcion)"></p>
                       </li>
                     </ul>
@@ -148,7 +142,7 @@
                       :key="fac.id_facilitador || id_fac"
                     >
                       <figure>
-                        <!-- ✅ Imagen de facilitador con URL segura -->
+
                         <img 
                           :src="buildSafeImageUrl(fac.foto_facilitador)" 
                           :alt="fac.nombre_facilitador || 'Foto del facilitador'"
@@ -161,7 +155,7 @@
                       <span class="designation">{{ fac.descripcion_facilitador }}</span>
                       
                       <ul class="teachers-follow">
-                        <!-- ✅ Validar enlaces externos con $isSafeLink -->
+
                         <li v-if="fac.facebook_facilitador?.trim() && $isSafeLink(fac.facebook_facilitador)">
                           <a :href="fac.facebook_facilitador.trim()" target="_blank" rel="noopener noreferrer">
                             <i class="fa fa-facebook" aria-hidden="true"></i>
@@ -245,25 +239,41 @@ figure,
   max-height: none !important;
   height: auto !important;
 }
+
 .image-zoom-container {
   position: relative;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
   cursor: zoom-in;
   overflow: visible !important;
+  padding: 0 15px;
+  box-sizing: border-box;
 }
+
 .preview-image {
   width: 100%;
   height: auto !important;
-  max-height: none !important;
+  max-height: 60vh !important;
   max-width: 100% !important;
   object-fit: contain !important;
   border-radius: 8px;
   display: block;
+  margin: 0 auto;
+  transition: transform 0.2s ease;
 }
+
+.image-zoom-container:hover .preview-image {
+  transform: scale(1.02);
+}
+
 .image-zoom-container:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
+
 .zoom-overlay {
   position: absolute;
   bottom: 15px;
@@ -282,13 +292,16 @@ figure,
   pointer-events: none;
   z-index: 10;
 }
+
 .image-zoom-container:hover .zoom-overlay { opacity: 1; }
 .zoom-overlay .fa-search-plus { font-size: 1rem; }
 
-/* MODAL DE ZOOM */
 .image-modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   align-items: center;
@@ -298,28 +311,39 @@ figure,
   overflow-y: auto;
   padding: 40px 20px;
 }
+
 .image-modal-content {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: zoomIn 0.3s ease;
 }
+
 .modal-image {
-  width: 100%;
+  width: auto;
   height: auto;
-  max-height: none;
+  max-width: 100%;
+  max-height: 90vh;
   object-fit: contain;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   display: block;
+  margin: 0 auto;
 }
+
 .modal-close-btn {
   position: fixed;
-  top: 30px; right: 30px;
+  top: 30px;
+  right: 30px;
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: #fff;
-  width: 50px; height: 50px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   cursor: pointer;
   font-size: 2rem;
@@ -329,16 +353,19 @@ figure,
   transition: all 0.2s;
   z-index: 10000;
 }
+
 .modal-close-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.1);
 }
+
 .bg-overlay-img { background-image: url("@/assets/Fondo2.jpg"); }
 .text-muted { color: #6c757d; }
 .text-center { text-align: center; }
 .py-5 { padding: 3rem 0; }
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
+
 .btn {
   display: inline-block;
   padding: 8px 20px;
@@ -349,15 +376,18 @@ figure,
   text-decoration: none;
   border: none;
 }
+
 .btn-outline {
   background: transparent;
   border: 1px solid var(--main-color, #c00014);
   color: var(--main-color, #c00014);
 }
+
 .btn-outline:hover {
   background: var(--main-color, #c00014);
   color: #fff;
 }
+
 .post-detail {
   list-style: none;
   padding: 0;
@@ -374,16 +404,28 @@ figure,
   gap: 0.3rem;
 }
 .post-detail .bold { font-weight: 600; }
-img.img-responsive { max-width: 100%; height: auto; }
-.spinner-border { width: 3rem; height: 3rem; border-width: 0.25em; }
+
+img.img-responsive {
+  max-width: 100%;
+  height: auto;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+}
 .visually-hidden {
   position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
 }
+
 .browse-teachers-list li { margin-bottom: 2rem; text-align: center; }
 .browse-teachers-list figure { margin: 0 auto 1rem; }
 .browse-teachers-list h3 { font-size: 1.1rem; margin: 0.5rem 0; }
@@ -406,21 +448,62 @@ img.img-responsive { max-width: 100%; height: auto; }
   font-size: 1.2rem;
   transition: color 0.2s;
 }
-.teachers-follow a:hover { color: var(--main-color, #c00014); }
+.teachers-follow a:hover { color: var(--main-color-2, #0B1C6B); }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes zoomIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 
 @media (max-width: 768px) {
+  .image-zoom-container {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  
+  .preview-image {
+    max-height: 50vh;
+  }
+  
   .modal-close-btn {
-    top: 15px; right: 15px;
-    width: 40px; height: 40px;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
     font-size: 1.5rem;
   }
-  .image-modal-overlay { padding: 20px 10px; }
+  
+  .image-modal-overlay {
+    padding: 20px 10px;
+  }
+  
+  .image-modal-content {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
 }
+
 @media (max-height: 600px) {
-  .image-modal-overlay { padding: 60px 10px 20px; }
+  .image-modal-overlay {
+    padding: 60px 10px 20px;
+  }
+  
+  .preview-image,
+  .modal-image {
+    max-height: 70vh;
+  }
+}
+
+@media (min-width: 1200px) {
+  .image-zoom-container {
+    max-width: 900px;
+  }
 }
 </style>
 
@@ -437,16 +520,13 @@ export default {
   },
   
   computed: {
-    ...mapState(["cursos", "url_api"]),
-
-    // ✅ imageUrl: sin fallback en producción
+    ...mapState(["cursos", "Institucion"]),  
     imageUrl() {
       const url = process.env.VUE_APP_UPLOADS_URL?.trim();
       if (process.env.VUE_APP_ENV === 'production' && !url) {
-        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
         return '';
       }
-      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
+      return url;
     },
 
     cursoData() {
@@ -471,7 +551,7 @@ export default {
   },
   
   methods: {
-    // ✅ Construir URL de imagen segura (fuerza HTTPS)
+
     buildSafeImageUrl(path) {
       if (!path) return '';
       const cleaned = String(path).trim();
@@ -481,8 +561,7 @@ export default {
       const base = this.imageUrl?.replace(/\/$/, '');
       return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
     },
-    
-    // ✅ Construir WhatsApp URL segura
+
     buildWhatsAppUrl(celular) {
       if (!celular) return '#';
       const cleaned = String(celular).replace(/[^0-9]/g, '');
@@ -517,10 +596,37 @@ export default {
       this.$store.commit("clickLink");
       this.$router.go(-1);
     },
+
+    applyDynamicColors() {
+      const colors = this.Institucion?.colorinstitucion;
+      if (colors && colors.length > 0) {
+        const colorSet = colors[0];
+        if (colorSet.color_primario) {
+          document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+        }
+        if (colorSet.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+        }
+        if (colorSet.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+        }
+      }
+    },
+  },
+
+  watch: {
+    Institucion: {
+      handler() {
+        this.applyDynamicColors();
+      },
+      deep: true,
+      immediate: true
+    }
   },
 
   mounted() {
     document.addEventListener('keydown', this.handleEscapeKey);
+    this.applyDynamicColors();
   },
 
   beforeUnmount() {
@@ -530,6 +636,7 @@ export default {
   
   created() {
     this.$store.commit("loading");
+    this.applyDynamicColors();
   },
 };
 </script>

@@ -67,12 +67,11 @@ export default {
     ...mapState(["url_api", "Institucion", "MenuConv", "MenuCur", "Colors", "getter", "statusImg", "Links"]),
     
     imageUrl() {
-      const url = (process.env.VUE_APP_UPLOADS_URL || '').trim();
-      if (process.env.VUE_APP_ENV === 'production' && !url) {
-        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
-        return '';
-      }
-      return url || 'https://apiadministrador.upea.bo';
+  const url = process.env.VUE_APP_UPLOADS_URL?.trim();
+  if (process.env.VUE_APP_ENV === 'production' && !url) {
+    return '';
+  }
+  return url;
     },
     
     institucionData() {
@@ -156,8 +155,9 @@ export default {
         
       } catch (error) {
         const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error cargando datos' : 'Error cargando MenuConv:', isProd ? '' : error);
-        
+if (!isProd) {
+  console.error('Error cargando MenuConv:', error);
+}
         if (!isProd) {
           try {
             const res = await api.get("/Tipoconvocatorias");
@@ -190,9 +190,10 @@ async getMenuCur() {
     this.$store.commit('setMenuCur', tiposCur);
     
   } catch (error) {
-    const isProd = process.env.VUE_APP_ENV === 'production';
-    console.error(isProd ? '❌ Error cargando datos' : 'Error cargando MenuCur:', isProd ? '' : error);
-    
+        const isProd = process.env.VUE_APP_ENV === 'production';
+        if (!isProd) {
+          console.error('Error cargando MenuCur:', error);
+        }
     if (!isProd) {
       try {
         const res = await api.get("/TipoCurso");
@@ -225,8 +226,9 @@ async getMenuCur() {
         
       } catch (error) {
         const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error cargando datos' : 'Error cargando Links:', isProd ? '' : error);
-        
+        if (!isProd) {
+          console.error('Error cargando Links:', error);
+        }
         if (!isProd) {
           try {
             const res = await api.get(`/linksIntExtAll/${this.idInstitucion}`);
@@ -259,9 +261,10 @@ async getMenuCur() {
         ));
         
       } catch (error) {
-        const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error cargando datos' : 'Error cargando contenido extra:', isProd ? '' : error);
-      }
+const isProd = process.env.VUE_APP_ENV === 'production';
+        if (!isProd) {
+          console.error('Error cargando contenido extra:', error);
+        }      }
     },
 
     async getInstitucion() {
@@ -282,8 +285,9 @@ async getMenuCur() {
         
       } catch (error) {
         const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error cargando institución' : 'Error getInstitucion:', isProd ? '' : error);
-      }
+        if (!isProd) {
+          console.error('Error getInstitucion:', error);
+        }      }
     },
 
     setImages(images) {
@@ -331,8 +335,9 @@ async getMenuCur() {
         
       } catch (error) {
         const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error en carga inicial' : 'Error en carga inicial:', isProd ? '' : error);
-      }
+        if (!isProd) {
+          console.error('Error en carga inicial:', error);
+        }      }
     },
 
     blockRighClick(event) {

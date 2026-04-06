@@ -118,23 +118,20 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
-
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition;
+      return savedPosition
     }
-    return { top: 0, behavior: 'smooth' };
+    return { top: 0, behavior: 'smooth' }
   }
 })
 
-
 router.beforeEach((to, from, next) => {
-  const isProd = process.env.VUE_APP_ENV === 'production';
+  const isProd = process.env.VUE_APP_ENV === 'production'
   if (!isProd) {
-
-    console.log(`[Router] Navegando de ${from.path} a ${to.path}`);
+    console.log(`[Router] Navegando de ${from.path} a ${to.path}`)
   }
-  next();
-});
+  next()
+})
 
-export default router;
+export default router

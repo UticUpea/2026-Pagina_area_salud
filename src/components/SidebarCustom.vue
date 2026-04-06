@@ -3,14 +3,12 @@
     <div class="category">
       <h3>Categorías</h3>
       <ul class="left-aligned">
-
         <li v-for="(conv, id_conv) of MenuConv" :key="conv.idtipo_conv_comun || id_conv">
           <router-link :to="'/convocatorias/' + conv.idtipo_conv_comun" @click="$store.commit('clickLink')">
             {{ formatTitle(conv.tipo_conv_comun_titulo) }}
             <span>{{ contarConv(conv.tipo_conv_comun_titulo) }}</span>  
           </router-link>
         </li>
-
 
         <li v-for="(cur, id_cur) of MenuCur" :key="cur.idtipo_curso_otros || id_cur">
           <router-link :to="'/cursos/' + cur.idtipo_curso_otros" @click="$store.commit('clickLink')">
@@ -55,7 +53,6 @@
     <div class="tags">
       <h3>Tags</h3>
       <ul class="tags-list clearfix left-aligned">
-
         <li v-for="(link, id_link) of linksData" :key="link.id_link || id_link">
           <a 
             v-if="getSafeLinkUrl(link)"
@@ -65,7 +62,6 @@
             :title="link.ei_tipo || link.tipo">
             {{ (link.ei_nombre || link.nombre)?.toUpperCase() }}<br>
           </a>
-
           <span 
             v-else
             :title="link.ei_tipo || link.tipo"
@@ -83,8 +79,10 @@
 </template>
 
 <style scoped>
-
 .left-aligned { text-align: left; }
+.blog-right { margin: 0 auto; max-width: 100%; }
+.category h3, .tags h3 { text-align: center; }
+.tags-list { justify-content: center; display: flex; }
 .category ul li { list-style: none; padding: 8px 0; border-bottom: 1px solid #eee; }
 .category ul li a { display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; }
 .category ul li a:hover { color: var(--main-color); }
@@ -168,18 +166,15 @@ export default {
   },
   
   methods: {
-
     getSafeLinkUrl(link) {
       if (!link) return null;
       const url = link.ei_link?.trim() || link.url_link?.trim();
       if (!url) return null;
       
-
       if (this.$isSafeLink?.(url)) {
         return url;
       }
       
-
       try {
         const normalized = url.startsWith('http') ? url : `https://${url}`;
         const parsed = new URL(normalized);

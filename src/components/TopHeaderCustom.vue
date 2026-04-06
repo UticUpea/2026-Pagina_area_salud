@@ -3,7 +3,6 @@
     <div class="container header-middle">
       <div class="row">
         <span class="col-xs-6 col-sm-3">
-
           <img :src="buildSafeImageUrl(Institucion?.institucion_logo)" 
                class="img-responsive" 
                alt="logo" 
@@ -16,7 +15,6 @@
             <ul class="hidden-xs">
               <li> 
                 <span>Email</span>
-
                 <a v-if="isValidEmail(Institucion?.institucion_correo1)" 
                    :href="'mailto:' + Institucion.institucion_correo1.trim()"
                    target="_blank"
@@ -83,21 +81,17 @@ export default {
     imageUrl() {
       const url = process.env.VUE_APP_UPLOADS_URL?.trim();
       if (process.env.VUE_APP_ENV === 'production' && !url) {
-        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
         return '';
       }
-      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
+      return url;
     },
     
-
     loginUrl() {
-      return process.env.VUE_APP_LOGIN_URL?.trim() || 
-        (process.env.VUE_APP_ENV !== 'production' ? 'https://servicioadministrador.upea.bo/sign-in' : '#');
+      return "https://servicioadministrador.upea.bo";
     },
   },
   
   methods: {
-
     buildSafeImageUrl(path) {
       if (!path) return '';
       const cleaned = String(path).trim();
@@ -111,7 +105,6 @@ export default {
     isValidEmail(email) {
       if (!email || typeof email !== 'string') return false;
       const cleaned = email.trim();
-
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned);
     },
     
@@ -122,7 +115,6 @@ export default {
     
     showSubMenu(id) {
       const menus = { m_inicio: false, m_conv: false, m_cur: false, m_mas: false, m_link: false };
-      
       if (Object.hasOwn(menus, id)) {
         this[id] = true;
         Object.keys(menus).forEach(key => {
@@ -138,23 +130,18 @@ export default {
     async getLinks() {
       try {
         const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
-
         if (!idInstitucion && process.env.VUE_APP_ENV === 'production') {
-          console.error('❌ VUE_APP_ID_INSTITUCION no definida en producción');
           return;
         }
         const res = await api.get(`/institucion/${idInstitucion}/recursos`);
-        
         const links = res.data.linksExternoInterno || [];
         const filterLinks = links.filter(link => link.estado === 1 || link.ei_estado === "1");
-        
         this.$store.commit('setLinks', filterLinks);
-        
       } catch (error) {
-
         const isProd = process.env.VUE_APP_ENV === 'production';
-        console.error(isProd ? '❌ Error cargando enlaces' : 'Error cargando Links en TopHeader:', isProd ? '' : error);
-        
+        if (!isProd) {
+          console.error('Error cargando Links en TopHeader:', error);
+        }
         try {
           const idInstitucion = process.env.VUE_APP_ID_INSTITUCION;
           if (!idInstitucion) return;

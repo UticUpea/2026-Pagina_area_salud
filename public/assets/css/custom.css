@@ -1133,7 +1133,7 @@ textarea:focus::placeholder{
 	padding: 30px;
 }
 .our-impotance ul li .inner img {
-	border-radius: 3px;
+	border-radius: 0px;
 }
 .our-impotance ul li:nth-child(3n) {
 	border-right: none;

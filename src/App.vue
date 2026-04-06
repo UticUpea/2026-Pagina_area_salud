@@ -17,12 +17,11 @@ nav {
 
 nav a {
   font-weight: bold;
-  /* color: #2c3e50; */
   color: var(--main-color-2)
 }
 
 nav a.router-link-exact-active {
-  /* color: #42b983; */
+
   color: var(--main-color)
 }
 </style>

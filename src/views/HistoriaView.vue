@@ -1,7 +1,4 @@
 <template>
-  <!-- ==============================================
-    ** Inner Banner **
-    =================================================== -->
   <div class="inner-banner blog">
     <div class="container">
       <div class="row">
@@ -17,13 +14,9 @@
     </div>
   </div>
 
-  <!-- ==============================================
-    ** Blog Detail **
-    =================================================== -->
   <div class="container blog-wrapper padding-lg">
     <div class="row">
       <div class="col-sm-8 blog-left">
-        <!-- ✅ Sanitizar HTML antes de renderizar (protección XSS) -->
         <p class="content left-aligned" 
            v-html="$sanitize(institucionData?.institucion_historia) || '<p class=\'text-center\'>Cargando historia...</p>'">
         </p>
@@ -37,40 +30,16 @@
 </template>
 
 <style scoped>
-/* ✅ Tus estilos originales se mantienen 100% intactos */
-.text-wrap {
-  text-align: justify;
-  padding: 0 70px;
-}
-
-h4 {
-  margin-top: 5px;
-  font-size: 15px;
-}
-
-p {
-  margin-bottom: 5px;
-}
-
-.image-container {
-  width: 100%;
-  height: 300px;
-  overflow: hidden;
-}
-
-.thumbnail-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.bg-overlay-img {
-  background-image: url("@/assets/Fondo2.jpg");
-}
-
-.active-link {
-  background: #540000;
-}
+.text-wrap { text-align: justify; padding: 0 70px; }
+h4 { margin-top: 5px; font-size: 15px; }
+p { margin-bottom: 5px; }
+.image-container { width: 100%; height: 300px; overflow: hidden; }
+.thumbnail-img { width: 100%; height: 100%; object-fit: cover; }
+.bg-overlay-img { background-image: url("@/assets/Fondo2.jpg"); }
+.active-link { background: #540000; }
+.content.left-aligned { color: inherit; line-height: 1.8; }
+.content.left-aligned a { color: var(--main-color, #c00014); text-decoration: none; }
+.content.left-aligned a:hover { color: var(--main-color-2, #0B1C6B); text-decoration: underline; }
 </style>
 
 <script>
@@ -96,8 +65,39 @@ export default {
     },
   },
   
+  methods: {
+    applyDynamicColors() {
+      const colors = this.Institucion?.colorinstitucion;
+      if (colors && colors.length > 0) {
+        const colorSet = colors[0];
+        if (colorSet.color_primario) {
+          document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+        }
+        if (colorSet.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+        }
+        if (colorSet.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+        }
+      }
+    },
+  },
+  
+  watch: {
+    Institucion: {
+      handler() { this.applyDynamicColors(); },
+      deep: true,
+      immediate: true
+    }
+  },
+  
   created() {
     this.$store.commit("loading");
+    this.applyDynamicColors();
+  },
+  
+  mounted() {
+    this.applyDynamicColors();
   },
 };
 </script>

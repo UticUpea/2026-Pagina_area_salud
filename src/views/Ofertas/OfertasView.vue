@@ -15,13 +15,52 @@
     </div>
   </div>
 
+  <div class="search-section">
+    <div class="container">
+      <div class="search-wrapper">
+        <div class="search-input-group">
+          <i class="fa fa-search search-icon" aria-hidden="true"></i>
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            @input="onSearchInput"
+            @keyup.enter="onSearchEnter"
+            :placeholder="searchPlaceholder"
+            class="search-input"
+            aria-label="Buscar ofertas académicas"
+          />
+          <button 
+            v-if="searchQuery" 
+            @click="clearSearch" 
+            class="search-clear"
+            aria-label="Limpiar búsqueda"
+          >
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <span class="search-results-count" v-if="searchQuery">
+          {{ ofertasFiltradas.length }} resultado{{ ofertasFiltradas.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
   <div class="container blog-wrapper padding-lg">
     <div class="row">
       <div class="col-sm-8 blog-left">
 
-        <div v-if="ofertasList.length === 0" class="col-12 justify-content-center text-center py-5">
-          <h2>NO HAY OFERTAS ACADÉMICAS</h2>
-          <p class="text-muted">Próximamente se agregarán nuevas ofertas académicas.</p>
+        <!-- Estado vacío -->
+        <div v-if="ofertasFiltradas.length === 0" class="col-12 justify-content-center text-center py-5">
+          <h2>SIN RESULTADOS</h2>
+          <p class="text-muted">
+            {{ searchQuery 
+              ? `No se encontraron ofertas académicas para "${searchQuery}"` 
+              : 'Próximamente se agregarán nuevas ofertas académicas.' 
+            }}
+          </p>
+          <button v-if="searchQuery" @click="clearSearch" class="btn btn-secondary">
+            Limpiar búsqueda
+          </button>
         </div>
 
         <ul v-else class="row news-listing">
@@ -35,7 +74,7 @@
                 :to="'/detalleOferta/' + ofer.ofertas_id"
                 @click="$store.commit('clickLink')"
               >
-                <!-- ✅ Imagen con URL segura -->
+
                 <img
                   :src="buildSafeImageUrl(ofer.ofertas_imagen)"
                   :alt="ofer.ofertas_titulo || 'Imagen de oferta académica'"
@@ -97,6 +136,28 @@
       </div>
 
       <div class="col-sm-4">
+
+        <div class="search-mobile-only">
+          <div class="search-input-group">
+            <i class="fa fa-search search-icon" aria-hidden="true"></i>
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              @input="onSearchInput"
+              @keyup.enter="onSearchEnter"
+              :placeholder="searchPlaceholder"
+              class="search-input"
+            />
+            <button 
+              v-if="searchQuery" 
+              @click="clearSearch" 
+              class="search-clear"
+            >
+              <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        
         <SidebarCustom />
       </div>
     </div>
@@ -104,15 +165,91 @@
 </template>
 
 <style scoped>
-.bg-overlay-img {
-  background-image: url("@/assets/Fondo2.jpg");
+
+.search-section {
+  background: #f8f9fa;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
 }
+.search-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.search-input-group {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 45px;
+  border: 2px solid #ddd;
+  border-radius: 25px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--main-color, #c00014);
+  box-shadow: 0 0 0 3px rgba(192, 0, 20, 0.1);
+}
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 1rem;
+  pointer-events: none;
+}
+.search-clear {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+.search-clear:hover {
+  color: var(--main-color, #c00014);
+}
+.search-results-count {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+@media (min-width: 768px) {
+  .search-mobile-only { display: none; }
+  .search-section { display: block; }
+}
+@media (max-width: 767px) {
+  .search-section { display: none; }
+  .search-mobile-only {
+    display: block;
+    margin-bottom: 1.5rem;
+    padding: 0 15px;
+  }
+  .search-mobile-only .search-input-group { max-width: 100%; }
+  .search-mobile-only .search-input {
+    padding: 10px 35px 10px 40px;
+    font-size: 0.95rem;
+  }
+}
+
+.bg-overlay-img { background-image: url("@/assets/Fondo2.jpg"); }
 .text-muted { color: #6c757d; }
 .text-center { text-align: center; }
 .py-5 { padding: 3rem 0; }
 .mt-4 { margin-top: 1.5rem; }
 
-/* Paginación */
 .pagination.blue {
   display: flex;
   gap: 0.25rem;
@@ -135,19 +272,14 @@
   color: #fff;
   border-color: var(--main-color, #c00014);
 }
-.pagination.blue li.disable a {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.pagination.blue li.disable a { opacity: 0.5; cursor: not-allowed; }
 .pagination.blue li a:hover:not(.disable) {
   background: var(--main-color, #c00014);
   color: #fff;
 }
 
-/* Imagen responsive */
 img.img-responsive { max-width: 100%; height: auto; }
 
-/* Post detail */
 .post-detail {
   list-style: none;
   padding: 0;
@@ -165,7 +297,6 @@ img.img-responsive { max-width: 100%; height: auto; }
 }
 .post-detail .bold { font-weight: 600; }
 
-/* Leer más */
 .read-more {
   display: inline-flex;
   align-items: center;
@@ -182,7 +313,6 @@ img.img-responsive { max-width: 100%; height: auto; }
 }
 .read-more .icon-play-icon { font-size: 0.9rem; }
 
-/* Grid items */
 .grid-item { margin-bottom: 1.5rem; }
 .grid-item .inner {
   border: 1px solid #eee;
@@ -193,6 +323,17 @@ img.img-responsive { max-width: 100%; height: auto; }
 .grid-item .inner:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-secondary { background: #6c757d; color: #fff; }
+.btn-secondary:hover { background: #5a6268; }
 </style>
 
 <script>
@@ -206,52 +347,66 @@ export default {
     return {
       NUM_RESULTS: 4,
       pag: 1,
+      searchQuery: '',
+      searchTimeout: null,
     };
   },
   
-  components: {
-    SidebarCustom,
-  },
+  components: { SidebarCustom },
   
   computed: {
-    ...mapState(["ofertas", "url_api"]),
-    
-    // ✅ imageUrl: sin fallback en producción + typo corregido
+    ...mapState(["ofertas", "url_api", "Institucion"]),  
+
     imageUrl() {
       const url = process.env.VUE_APP_UPLOADS_URL?.trim();
       if (process.env.VUE_APP_ENV === 'production' && !url) {
-        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
         return '';
       }
-      // ✅ Solo fallback para desarrollo (con URL correcta https://)
-      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
+      return url;
+    },
+
+    searchPlaceholder() {
+      return 'Buscar ofertas académicas por título...';
     },
 
     ofertasList() {
       return this.ofertas?.filter(o => o.ofertas_id && o.ofertas_estado === 1) || [];
     },
 
+    ofertasFiltradas() {
+      const query = this.searchQuery.toLowerCase().trim();
+      
+      let filtradas = this.ofertasList;
+      
+      if (query) {
+        filtradas = filtradas.filter(ofer => {
+          const titulo = ofer.ofertas_titulo?.toLowerCase() || '';
+          return titulo.includes(query);
+        });
+      }
+      
+      return filtradas;
+    },
+
     pager() {
-      return Math.ceil(this.ofertasList.length / this.NUM_RESULTS);
+      return Math.ceil(this.ofertasFiltradas.length / this.NUM_RESULTS);
     },
 
     ofertasPaginadas() {
       const start = (this.pag - 1) * this.NUM_RESULTS;
       const end = start + this.NUM_RESULTS;
-      return this.ofertasList.slice(start, end);
+      return this.ofertasFiltradas.slice(start, end);
     },
   },
   
   methods: {
-    // ✅ Construir URL de imagen segura (fuerza HTTPS)
+
     buildSafeImageUrl(path) {
       if (!path) return '';
       const cleaned = String(path).trim();
-      // Si ya es URL absoluta, forzar HTTPS
       if (cleaned.startsWith('http')) {
         return cleaned.replace('http://', 'https://');
       }
-      // Si es ruta relativa, unir con base URL
       const base = this.imageUrl?.replace(/\/$/, '');
       return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
     },
@@ -264,46 +419,79 @@ export default {
       return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
     },
     
+
+    onSearchInput() {
+      if (this.searchTimeout) clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => { this.pag = 1; }, 300);
+    },
+    
+    onSearchEnter() {
+      if (this.searchTimeout) clearTimeout(this.searchTimeout);
+      this.pag = 1;
+    },
+    
+    clearSearch() {
+      this.searchQuery = '';
+      this.pag = 1;
+      this.$nextTick(() => {
+        const input = document.querySelector('.search-input');
+        if (input) input.focus();
+      });
+    },
+    
+
     goToPage(page) {
       if (page >= 1 && page <= this.pager) {
         this.pag = page;
         this.scrollToTop();
       }
     },
-    
-    prevPage() {
-      if (this.pag > 1) {
-        this.pag--;
-        this.scrollToTop();
-      }
-    },
-    
-    nextPage() {
-      if (this.pag < this.pager) {
-        this.pag++;
-        this.scrollToTop();
-      }
-    },
-    
+    prevPage() { if (this.pag > 1) { this.pag--; this.scrollToTop(); } },
+    nextPage() { if (this.pag < this.pager) { this.pag++; this.scrollToTop(); } },
     scrollToTop() {
-      window.scrollTo({
-        top: 400, 
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    },
+    
+    applyDynamicColors() {
+      const colors = this.Institucion?.colorinstitucion;
+      if (colors && colors.length > 0) {
+        const colorSet = colors[0];
+        if (colorSet.color_primario) {
+          document.documentElement.style.setProperty('--main-color', colorSet.color_primario);
+        }
+        if (colorSet.color_secundario) {
+          document.documentElement.style.setProperty('--main-color-2', colorSet.color_secundario);
+        }
+        if (colorSet.color_terciario) {
+          document.documentElement.style.setProperty('--main-color-3', colorSet.color_terciario);
+        }
+      }
     },
   },
   
   watch: {
-    ofertasList: {
-      handler() {
-        if (this.pag > this.pager) this.pag = 1;
-      },
+    ofertasFiltradas: {
+      handler() { if (this.pag > this.pager) this.pag = 1; },
       immediate: true
     },
+    Institucion: {
+      handler() { this.applyDynamicColors(); },
+      deep: true,
+      immediate: true
+    }
   },
   
   created() {
     this.$store.commit("loading");
+    this.applyDynamicColors();
+  },
+  
+  mounted() {
+    this.applyDynamicColors();
+  },
+  
+  beforeUnmount() {
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
   },
 };
 </script>

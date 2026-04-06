@@ -8,7 +8,6 @@
               <br><br>
               <h3 :style="{ color: colors.text }">CONÉCTATE CON NOSOTROS</h3>
               <ul class="follow-us">
-               
                 <li v-if="institucionData?.institucion_facebook?.trim() && $isSafeLink(institucionData.institucion_facebook)">
                   <a :href="institucionData.institucion_facebook.trim()" 
                      target="_blank" rel="noopener noreferrer"
@@ -30,8 +29,6 @@
                     <i class="fa fa-youtube-play" aria-hidden="true"></i>
                   </a>
                 </li>
-                
-              
                 <li v-if="institucionData?.institucion_celular1 && institucionData.institucion_celular1 != 0">
                   <a :href="buildWhatsAppUrl(institucionData.institucion_celular1)" 
                      target="_blank" rel="noopener noreferrer"
@@ -46,8 +43,6 @@
                     <i class="fa fa-whatsapp" aria-hidden="true"></i>
                   </a>
                 </li>
-                
-              
                 <li v-if="institucionData?.institucion_correo2?.trim() && isValidEmail(institucionData.institucion_correo2)">
                   <a :href="'mailto:' + institucionData.institucion_correo2.trim()" 
                      target="_blank" rel="noopener noreferrer"
@@ -55,8 +50,6 @@
                     <i class="fa fa-envelope" aria-hidden="true"></i>
                   </a>
                 </li>
-                
-               
                 <li v-if="institucionData?.institucion_telefono2 && institucionData.institucion_telefono2 != 0">
                   <a :href="'tel:+591' + String(institucionData.institucion_telefono2).replace(/[^0-9]/g, '')" 
                      target="_blank" rel="noopener noreferrer"
@@ -137,14 +130,9 @@ export default {
       }
       return data;
     },
-    
+
     imageUrl() {
-      const url = process.env.VUE_APP_UPLOADS_URL?.trim();
-      if (process.env.VUE_APP_ENV === 'production' && !url) {
-        console.error('❌ VUE_APP_UPLOADS_URL no definida en producción');
-        return '';
-      }
-      return url || (process.env.VUE_APP_ENV !== 'production' ? 'https://apiadministrador.upea.bo' : '');
+      return process.env.VUE_APP_UPLOADS_URL?.trim() || '';
     },
 
     currentYear() { return new Date().getFullYear(); },
@@ -187,23 +175,30 @@ export default {
   },
   
   methods: {
+
     buildSafeImageUrl(path) {
       if (!path) return '';
       const cleaned = String(path).trim();
-      if (cleaned.startsWith('http')) {
+
+      if (cleaned.startsWith('https://')) {
+        return cleaned;
+      }
+
+      if (cleaned.startsWith('http://')) {
         return cleaned.replace('http://', 'https://');
       }
+      
       const base = this.imageUrl?.replace(/\/$/, '');
+      if (!base) return '';
+      
       return `${base}${cleaned.startsWith('/') ? cleaned : `/${cleaned}`}`;
     },
-    
 
     buildWhatsAppUrl(celular) {
       if (!celular) return '#';
       const cleaned = String(celular).replace(/[^0-9]/g, '');
       return `https://wa.me/+591${cleaned}`;
     },
-    
 
     isValidEmail(email) {
       if (!email) return false;
@@ -235,23 +230,13 @@ export default {
       return nombre.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
     },
   },
-  
-  mounted() {
-    // if (process.env.NODE_ENV === 'development') {
-    //     console.log(' Footer - Institución:', {
-    //     id: this.institucionData?.institucion_id,
-    //     nombre: this.institucionData?.institucion_nombre
-    //   });
-    // }
-  }
 };
 </script>
 
 <style scoped>
-
 .footer { 
-  margin-top: 0; 
-  font-family: inherit; 
+margin-top: 0; 
+font-family: inherit; 
 }
 .footer .bottom { 
   padding: 40px 0 20px; 
@@ -271,8 +256,6 @@ export default {
   margin-bottom: 10px; 
   transition: color 0.3s ease; 
 }
-
-/* Iconos sociales */
 .follow-us { 
   list-style: none; 
   padding: 0; 
@@ -285,12 +268,12 @@ export default {
   display: flex; 
   align-items: center; 
   justify-content: center; 
-  width: 40px; height: 40px; 
+  width: 40px; 
+  height: 40px; 
   border-radius: 50%; 
   background: rgba(255, 255, 255, 0.15); 
   transition: all 0.3s ease; 
-  text-decoration: none; 
-}
+  text-decoration: none; }
 .follow-us li a:hover { 
   transform: translateY(-3px); 
   background: rgba(255, 255, 255, 0.25); 
@@ -303,8 +286,6 @@ export default {
 .follow-us li a:hover i { 
   transform: scale(1.1); 
 }
-
-/* Logos */
 .footer-logo { 
   display: flex; 
   align-items: center; 
@@ -314,15 +295,12 @@ export default {
 }
 .footer-logo img { 
   border-radius: 8px; 
-  transition: transform 0.3s ease, 
-  box-shadow 0.3s ease;
- }
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
 .footer-logo img:hover { 
   transform: scale(1.05); 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
 }
-
-/* Copyright */
 .footer .bottom p { 
   font-size: 13px; 
   opacity: 0.9; 
@@ -331,14 +309,12 @@ export default {
 .footer .bottom p span { 
   font-weight: 600; 
 }
-
-/* Scroll to top */
 .scroll-top { 
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 45px;
-  height: 45px;
+  position: fixed; 
+  bottom: 25px; 
+  right: 25px; 
+  width: 45px; 
+  height: 45px; 
   border-radius: 50%; 
   display: flex; 
   align-items: center; 
@@ -355,27 +331,25 @@ export default {
 .scroll-top i { 
   font-size: 18px; 
 }
-
-
-@media (max-width: 768px) {
+@media (max-width: 768px) { 
   .footer .bottom { 
     padding: 30px 0 15px; 
-    text-align: center; 
-  }
-  .follow-us { 
+    text-align: center;
+   } 
+   .follow-us { 
     justify-content: center; 
-  }
+  } 
   .footer-logo { 
     justify-content: center; 
-  }
+  } 
   .scroll-top { 
     bottom: 15px; 
     right: 15px; 
     width: 40px; 
     height: 40px; 
-  }
+  } 
 }
 .color { 
   color: var(--main-color-3, currentColor); 
-}
+  }
 </style>
