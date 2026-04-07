@@ -4,7 +4,7 @@ const clean = (value) => value?.trim() || ''
 
 const API_BASE = clean(process.env.VUE_APP_API_BASE_URL)
 const API_TOKEN = clean(process.env.VUE_APP_API_TOKEN)
-const UPLOADS_URL = clean(process.env.VUE_APP_UPLOADS_URL)
+// ✅ ELIMINADO: UPLOADS_URL ya no es necesario (imágenes vienen con URL completa)
 const ENV = clean(process.env.VUE_APP_ENV) || 'development'
 
 if (!API_BASE) {
@@ -14,12 +14,8 @@ if (!API_BASE) {
   throw new Error('VUE_APP_API_BASE_URL es requerida')
 }
 
-if (!UPLOADS_URL) {
-  if (ENV !== 'production') {
-    console.error('VUE_APP_UPLOADS_URL no está definida. Agrega esta variable a tu .env')
-  }
-  throw new Error('VUE_APP_UPLOADS_URL es requerida')
-}
+// ✅ ELIMINADO: Validación de UPLOADS_URL (ya no se usa)
+// if (!UPLOADS_URL) { ... }
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -60,7 +56,9 @@ api.interceptors.response.use(
   }
 )
 
-api.uploadsUrl = UPLOADS_URL
+// ✅ ELIMINADO: api.uploadsUrl ya no es necesario
+// api.uploadsUrl = UPLOADS_URL
+
 api.clean = clean 
 
 export default api
