@@ -101,6 +101,25 @@ const routes = [
         name: 'historiaView',
         component: () => import('@/views/HistoriaView.vue')
       },
+{
+  path: '/instituto',
+  name: 'InstitutoView',
+  component: () => import('@/views/Instituto/InstitutoView.vue')  
+},{
+  path: '/instituto/detalle-gaceta/:id',
+  name: 'DetalleGacetaInstituto',
+  component: () => import('@/views/Instituto/DetalleGacetaInstituto.vue')
+},
+{
+  path: '/instituto/detalle-evento/:id',
+  name: 'DetalleEventoInstituto',
+  component: () => import('@/views/Instituto/DetalleEventoInstituto.vue')
+},
+{
+  path: '/instituto/detalle-publicacion/:id',
+  name: 'DetallePublicacionInstituto',
+  component: () => import('@/views/Instituto/DetallePublicacionInstituto.vue')
+}
     ]
   },
   {

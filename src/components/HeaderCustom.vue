@@ -1,6 +1,5 @@
 <template>
   <TopHeaderCustom v-if="isHome" />
-
   <header id="header" class="sticky-header">
     <nav class="navbar navbar-inverse" :style="navbarStyles">
       <div class="container">
@@ -152,6 +151,11 @@
               </ul>
             </li>
 
+<li>
+  <router-link to="/instituto" @click="closeAll()" :style="{ color: colors.text }">
+    INSTITUTO DE INVESTIGACION
+  </router-link>
+</li>
             <li class="dropdown" :class="{ 'open': activeDropdown === 'enlaces' }">
               <a href="#" @click.stop.prevent="toggleDropdown('enlaces')" :style="{ color: colors.text }">
                 ENLACES <i class="fa fa-angle-down" aria-hidden="true"></i>

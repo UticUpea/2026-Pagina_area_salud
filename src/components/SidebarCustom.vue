@@ -43,6 +43,11 @@
           </router-link>
         </li>
         <li>
+  <router-link to="/instituto" @click="$store.commit('clickLink')">
+    Instituto de Investigación
+  </router-link>
+</li>
+        <li>
           <router-link to="/videos" @click="$store.commit('clickLink')">
              Videos <span>{{ videosCount }}</span>
           </router-link>
